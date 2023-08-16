@@ -6,8 +6,8 @@
 
 int main ()
 {
-	int i=0,j,tl=0,x,opi;
-	char vet[10][100],Op,copyname[100],AuxNome[100];
+	int i=0,j,tl=0,x,opi,tl2=0,tl3=0;
+	char vet[10][100],vet2[10][100],vet3[20][100],Op,copyname[100],AuxNome[100],Letra;
 
 	do
 	{
@@ -16,6 +16,8 @@ int main ()
         printf("# # # Menu # # #\n");
 		printf("[A] Inserir Nomes em uma Lista\n");
 		printf ("[B] Exibir a Lista\n[C] Ordenar a Lista\n[D] Excluir Nomes da Lista ate se pressionar <ENTER>\n[ESC] Sair\n");
+		printf ("[E] Inserir Nomes na Lista 2\n");
+		printf ("[F] Fazer a inserção na lista3\n");
 
 		//scanf("%c",&Op); //SCANF NÃO PEGA SIMBOLO PARA ISSO USAMOS O getch
         //getche mostra na tela a letra pressionada e o getch não
@@ -72,6 +74,46 @@ int main ()
 					getch();
 				
 				}
+		}
+			if(Op =='E'||Op =='e')
+		{	
+			if(tl2<10)
+			{
+				printf("\nDigite o nome da pessoa que deseja na lista\n");
+				gets(AuxNome);
+
+				// strlen é usado para contar até o \0 no vetor , se der 0 é pq não tem nada ou seja apertei <ENTER>
+				while(strlen(AuxNome)>0)
+				{   
+                	for(i=0;i<tl&&stricmp(AuxNome,vet2[i])!=0;i++);
+
+    				while(tl<10&&stricmp(AuxNome,vet2[i])==0)
+                		{
+                		printf("Nome ja existente , por favor digitar outro nome\n");
+                		gets(vet2[i]);
+                		
+                		}
+                	if(stricmp(AuxNome,vet2[i])!=0)
+                	{
+				    	
+				    	fflush(stdin);
+				    	strcpy(vet2[tl],AuxNome);
+						i++;
+                    	tl2++;
+				    	
+                	}
+                	printf("\nDigite o nome da pessoa que deseja na lista\n");
+					gets(AuxNome);
+
+			    }
+			}else
+				if(tl==10||tl>10)
+				{
+					printf("A lista de nomes ja está cheia!!");
+					getch();
+				
+				}
+			
 		}
 		if(Op=='b'||Op=='B')
 		{	if(tl==0)
@@ -136,8 +178,63 @@ int main ()
 				else
                 	printf("Não foi possível deletar poís o número do item não existe\n");
         	}
+        	
 
             getch();
+		}
+		//Inserção , Buscando atravez da letra    OBS: PRECISA ARRUMAR AINDA
+		if(Op == 'f' || Op == 'F')
+		{
+			if(tl3<20)
+			{
+				printf("\nDigite a letra que deseja realizar inserção\n")	;
+				fflush(stdin);
+				Letra= toupper(getche());
+				i=0;
+				j=0;
+				//Lista 1
+					while(i<tl&&Letra != vet[i][0])
+						i++;
+					
+					if(Letra == vet[i][0])
+					{
+						while(j<tl3&&stricmp(vet[i],vet3[j])!=0)
+							j++;
+						if(j<tl3&&stricmp(vet[i],vet3[j])==0)
+						{
+							strcpy(vet[i],vet3[j]);
+							tl3++;
+						}
+						
+					}
+					else
+					{
+						printf("\nNenhum nome com essa Letra na Lista 1\n");
+						getch();
+					}
+					i=0;
+					j=0;
+					//Lista 2
+					while(i<tl&&Letra != vet2[i][0])
+						i++;
+					if(Letra == vet2[i][0])
+					{
+						while(j<tl3&&stricmp(vet2[i],vet3[j])!=0)
+							j++;
+						if(j<tl3&&stricmp(vet2[i],vet3[j])==0)
+						{
+							strcpy(vet2[i],vet3[j]);
+							tl3++;
+						}
+						
+					}
+					else
+					{
+						printf("\nNome nao encontrado na Lista 2\n");
+						getch();
+					}
+				
+			}
 		}
 
 
