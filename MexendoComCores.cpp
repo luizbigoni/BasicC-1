@@ -5,10 +5,10 @@
 int main(void)
 {
 	// MATÉRIA SOBRE O DOS , MODIFICANDO O DOS E MEXENDO COM AS POSIÇÕES DAS PALAVRAS
-	char nome[40],tecla;
-	int tl=0,x=0,y=1,linha=1,coluna=1;
+	char nome[40],tl;
+	int cont=0,x=0,y=1,linha=1,coluna=1;
 	//OBJETIVO É FAZER MOSTRAR A TABELA ASCII TROCANDO AS CORES
-	for(tl=0;tl<257;tl++)
+	for(tl=0;cont<257;tl++,cont++)
 	{	
 		if(y==x)
 			y++;
@@ -16,21 +16,22 @@ int main(void)
 			x=0;
 		if(y==7)
 			y=0;
-		if(coluna==24)
+		if(linha==24)
 		{
-			linha=linha + 7;
-			coluna = 1;
+			coluna=coluna + 10;
+			linha = 1;
 		}
 		
 		
-		textcolor(x);
-		textbackground(y);
-		gotoxy(coluna,linha);
-		printf("%d -- %c\n",tl,tl);
-		coluna++;
-		tl++;
-		y++;
-		x++;
+		
+			textcolor(x);
+			textbackground(y);
+			gotoxy(coluna,linha);
+			printf("N:%d S:%c\n",tl,tl);
+			linha++;
+			y++;
+			x++;
+		
 	}
 	
 	
@@ -55,7 +56,7 @@ int main(void)
 		clrscr(); // Função própria do C ele pinta a tela com a cor que eu definir
 		return 0;*/
 	
-	
-	
+	gotoxy(60,100);
+	return 0;
 	
 }
