@@ -57,46 +57,99 @@ int main()
 		x = getch();
 		
 		//if(x==24)//cima
-		if(x=='w')
-		{
-			gotoxy(cf,lf--);
-			printf("%c",4);
-			lf++;
-			gotoxy(cf,lf);
+		if(x==72)
+		{	
+			aux2-=1;
+			if(aux2==li)
+			{
+				printf("%c",205);
+				gotoxy(aux,aux2+1);
+				printf("%c",0);
+				aux2=aux2+lf-2;
+				gotoxy(aux,aux2);
+				printf("%c",4);
+				
+			}
+			else{
+			
+			//aux2-=1;
+			gotoxy(aux,aux2+1);
 			printf("%c",0);
-			gotoxy(cf,lf++);
+			gotoxy(aux,aux2);
+			printf("%c",4);
+		}
 		}
 		
 		//if(x==25)//baixo
-		if(x=='s')
+		if(x==80)
 		{
-			gotoxy(cf,lf++);
-			printf("%c",4);
-			lf--;
-			gotoxy(cf,lf);
+			aux2+=1;
+			if(aux2==lf)
+			{
+				printf("%c",205);
+				gotoxy(aux,aux2-1);
+				printf("%c",0);
+				aux2=aux2-lf+2;
+				gotoxy(aux,aux2);
+				printf("%c",4);
+				
+			}
+			else{
+			
+			gotoxy(aux,aux2-1);
 			printf("%c",0);
-			gotoxy(cf,lf--);
+			gotoxy(aux,aux2);
+			printf("%c",4);
+			}
 		}
 		
 		//if(x==26)//esquerda
-		if(x=='a')
+		if(x==75)
 		{
-			gotoxy(cf--,lf);
-			printf("%c",4);
-			cf--;
-			gotoxy(cf,lf);
+			aux-=1;
+			if(aux==ci)
+			{
+				
+				printf("%c",186);
+				gotoxy(aux+1,aux2);
+				printf("%c",0);
+				aux=aux+cf-2;
+				gotoxy(aux,aux2);
+				printf("%c",4);
+				
+			}
+			else{
+			
+			gotoxy(aux+1,aux2);
 			printf("%c",0);
-			gotoxy(cf--,lf);
+			
+			gotoxy(aux,aux2);
+			printf("%c",4);
+		}
 		}
 		//if(x==27)//direita
-		if(x=='d')
+		if(x==77)
 		{
-			gotoxy(cf++,lf);
-			printf("%c",4);
-			cf++;
-			gotoxy(cf,lf);
+			aux+=1;
+			if(aux==cf)
+			{
+				printf("%c",186);
+				gotoxy(aux-1,aux2);
+				printf("%c",0);
+				aux=aux-cf+2;
+				gotoxy(aux,aux2);
+				printf("%c",4);
+				
+			}
+			else
+			{
+			
+			gotoxy(aux-1,aux2);
 			printf("%c",0);
-			gotoxy(cf++,lf);
+			gotoxy(aux,aux2);
+			printf("%c",4);
+		}
+		
 			
 		}
 		
