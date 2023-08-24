@@ -56,7 +56,9 @@ int main (void)
 	int Numero = LeValor();
 	Numero =IntToBin(Numero);   //IntToBin(Numero) Vai pegar a variavel numero e criar uma copia na Variavel Decimal da função
 									
-	ExibeValor(Numero);					
+	ExibeValor(Numero);			
+	
+	// ExibeValor(IntToBin(LeValor()))	PODERIA SER FEITO ASSIM	
 	
 	return 0;
 }
