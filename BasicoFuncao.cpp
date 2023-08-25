@@ -62,3 +62,78 @@ int main (void)
 	
 	return 0;
 }
+
+
+
+
+// OUTRO CODIGO
+
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+// CODIGO PARA FAZER A OPERAÇÃO REVERSA DO EXPOENTE ( LOGARITMO )
+
+//Declarar a função antes
+int LeNumero(void);
+float OpInversa(float b,float ex);
+ 
+ 
+ //FUNÇÃO EM CIMA DO MAIN QUANDO VOCÊ NÃO DECLARA EM CIMA
+/*int LeNumero(void)
+{
+    int num;
+    printf("\nDigite um numero: ");
+    scanf("%d",&num);
+    return num;
+}
+
+float OpInversa(float b,float ex)
+{
+    float aux , aux2 = b;
+    for (aux = 0 ; aux < ex ; aux++)
+       {
+           b = b / aux2;
+       }
+    //b = pow(b,ex);
+    
+    
+    return b;
+}
+*/
+
+
+int main (void)
+{
+    int numero = LeNumero() , expoente = LeNumero();
+    float soma = OpInversa(numero,expoente);
+    printf("\nA soma da operação inversa e: %f",soma);
+
+}
+
+//Função abaixo do main quando você declara em cima
+
+int LeNumero(void)
+{
+    int num;
+    printf("\nDigite um numero: ");
+    scanf("%d",&num);
+    return num;
+}
+
+float OpInversa(float b,float ex)
+{
+    float aux , aux2 = b;
+    for (aux = 0 ; aux < ex ; aux++)
+       {
+           b = b / aux2;
+       }
+    //b = pow(b,ex);
+    
+    
+    return b;
+}
+
+
