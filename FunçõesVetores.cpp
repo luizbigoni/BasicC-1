@@ -43,6 +43,7 @@ void LeValor (int vet[tf],int &tl)
 		scanf("%d",&aux);
 	}
 }
+// EXERCICIO PARA PEGAR O NUMERO QUE MAIS SE REPETE USANDO FUNÇÃO E VETORES
 int main (void)
 {
 	int v[tf], tam=0 , NrMais , Qtde;
