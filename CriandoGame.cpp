@@ -1,22 +1,18 @@
-#include <stdio.h>
 #include <conio2.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include <windows.h>
+#include <ctype.h>
+#include <string.h>
+#define tf 100
 
-int main()
-{	//char 
-	int ci,cf,li,lf,aux,x,aux2;
-	
-	printf("Digite a coluna inicial[1...80]\n");
-	printf("Digite a linha inicial[1...25]\n");
-	printf("Digite a coluna final[1...80]\n");
-	printf("Digite a linha final[1...25]\n");
-	scanf("%d%d%d%d",&ci,&li,&cf,&lf);
+// Menuzinho com borda  CLEAN
+char CriarMenu(void)
+{
 	clrscr();
-	
-	//Sleep serve como um delay
-	//textcolor(2);
-	//textbackground(2);
+	int li , ci , lf , cf;
+	li = ci = 1;
+	lf = 12;
+	cf = 70;
 	gotoxy(ci,li);
 	printf("%c",201);
 	gotoxy(ci,lf);
@@ -25,11 +21,7 @@ int main()
 	printf("%c",187);
 	gotoxy(cf,lf);
 	printf("%c",188);
-	//textcolor(2);
-	//textbackground(2);
-	
-	
-	for(aux=ci+1;aux<cf;aux++)
+	for(int aux=ci+1;aux<cf;aux++)
 	{
 		gotoxy(aux,li);
 		printf("%c",205);
@@ -47,116 +39,180 @@ int main()
 		printf("%c",186);
 		//Sleep(150);
 	}
-	aux=cf/2;
-	aux2=lf/2;
-	gotoxy(aux,aux2);
-	printf("%c",4);
-	do
+	gotoxy(30,2);
+	printf("##Opcoes##");
+	gotoxy(10,3);
+	printf("[A] Ler Vetor");
+	gotoxy(10,4);
+	printf("[B] Exibe Vetor");
+	gotoxy(10,5);
+	printf("[C] Frequencia -- Ex.01");
+	gotoxy(10,6);
+	printf("[D] ConsultarElemento");
+	gotoxy(10,7);
+	printf("[E] Ordenar Vetor");
+	gotoxy(10,8);
+	printf("[F] Excluir Elemento");
+	gotoxy(10,9);
+	printf("[ESC] Sair");
+	gotoxy(10,10);
+	printf(" OPCAO : ");
+	
+	
+	
+	return toupper(getche());
+	
+}
+// Exibir vetor
+void ExibirVetor (int vetor[tf],int tl)
+{
+	if(tl == 0)
+		printf("\n Vetor Vazio!!!");
+	else
+		for(int i = 0; i < tl ; i++)
+			printf("\nVetor na pos [%d]: %d ",i,vetor[i]);
+	
+	
+	
+	getch();
+}
+
+
+// Por valor é sem o & e referencia usa o &
+void Frequencia (int vetor[tf],int tl,int &valor,int &QtdeVezes)
+{
+	QtdeVezes =0;
+	for(int i=0;i<tl;i++)
 	{
-		fflush(stdin);
-		x = getch();
-		
-		//if(x==24)//cima
-		if(x==72)
-		{	
-			aux2-=1;
-			if(aux2==li)
-			{
-				printf("%c",205);
-				gotoxy(aux,aux2+1);
-				printf("%c",0);
-				aux2=aux2+lf-2;
-				gotoxy(aux,aux2);
-				printf("%c",4);
-				
-			}
-			else{
-			
-			//aux2-=1;
-			gotoxy(aux,aux2+1);
-			printf("%c",0);
-			gotoxy(aux,aux2);
-			printf("%c",4);
-		}
-		}
-		
-		//if(x==25)//baixo
-		if(x==80)
+		int Qtde = 0;
+		for(int j=i;j<tl;j++)
 		{
-			aux2+=1;
-			if(aux2==lf)
+			if(vetor[i]==vetor[j])
 			{
-				printf("%c",205);
-				gotoxy(aux,aux2-1);
-				printf("%c",0);
-				aux2=aux2-lf+2;
-				gotoxy(aux,aux2);
-				printf("%c",4);
-				
+				Qtde++;
 			}
-			else{
 			
-			gotoxy(aux,aux2-1);
-			printf("%c",0);
-			gotoxy(aux,aux2);
-			printf("%c",4);
-			}
 		}
-		
-		//if(x==26)//esquerda
-		if(x==75)
-		{
-			aux-=1;
-			if(aux==ci)
+	if (Qtde > QtdeVezes )
+	{
+		QtdeVezes = Qtde;
+		valor = vetor[i];
+	}	
+}
+}
+// TODO VETOR É PASSADO POR REFERENCIA , OU SEJA NÃO PRECISA DE & , SE COLOCAR VAI DAR ERROR !!!!
+void LeValor (int vet[tf],int &tl)
+{
+	int aux;
+	printf("\nDigite um numeros no vetor: ");
+	printf ("Vetor[%d]: ",tl);
+	scanf("%d",&aux);
+	while(tl<tf && aux > 0)
+	{
+		vet[tl] = aux;
+		tl++;
+		printf("\nDigite um numeros no vetor: ");
+		printf ("Vetor[%d]: ",tl);
+		scanf("%d",&aux);
+	}
+}
+// Consulta Exaustiva é ver 1 por 1
+int BuscaExaustiva(int vetor[tf],int tl,int valor)
+{
+		int i;
+			for (i=0; i < tl && valor != vetor[i];i++);
+			
+			
+			if ( i > tl)
 			{
-				
-				printf("%c",186);
-				gotoxy(aux+1,aux2);
-				printf("%c",0);
-				aux=aux+cf-2;
-				gotoxy(aux,aux2);
-				printf("%c",4);
-				
-			}
-			else{
-			
-			gotoxy(aux+1,aux2);
-			printf("%c",0);
-			
-			gotoxy(aux,aux2);
-			printf("%c",4);
-		}
-		}
-		//if(x==27)//direita
-		if(x==77)
-		{
-			aux+=1;
-			if(aux==cf)
-			{
-				printf("%c",186);
-				gotoxy(aux-1,aux2);
-				printf("%c",0);
-				aux=aux-cf+2;
-				gotoxy(aux,aux2);
-				printf("%c",4);
-				
+				return -1;
 			}
 			else
 			{
+				return i;
+			}
+		
+}
+void Consultar (int Vet[tf],int tl)
+{
+	int i , pos , elemento;
+	printf("\n ## Consultar no Vetor ##");
+	if (Qtde == 0) printf("\nVetor Vazio!\n");
+	else{
+		printf("\nConsultar por: ");
+		scanf ("%d",&elemento);
+		while(elemento>0)
+		{
+			pos = BuscaExaustiva(Vet,tl,elemento);
+			if(pos == -1);
+				printf("\n O numero digitado nao foi encontrado");
+			else{
+				printf("\nElemento [%d] encontrado na pos [%d]");
+				
+			}
+		getch();
+		printf("\n\nConsultar por: ");
+		scanf("%d",&elemento);
+		}
+	}
+}
+// Fazer um executavel para fazer tudo para o main
+void Executar(void)
+{
+	int V[tf] ,tam=0,Qtde,NrMais,num;
+	char op;
+	do
+	{
+		op = CriarMenu();
+		switch(op)
+		{
+			case 'A': if(tam==tf) printf("\nVetor Cheio\n");
+						else
+						{  clrscr();
+							LeValor(V,tam);
+							printf("\nElementos Inseridos\n");
+						}
+					getch();
+					break;
 			
-			gotoxy(aux-1,aux2);
-			printf("%c",0);
-			gotoxy(aux,aux2);
-			printf("%c",4);
+			case 'B': clrscr();ExibirVetor(V,tam);
+					  break;
+			
+			
+			case 'C': clrscr();if (tam == 0) printf("\nVetor Vazio , nao sera possivel calcular a frequencia");
+					  else
+					  {
+					  	Frequencia(V,tam,NrMais,Qtde);
+					  	printf("\nNúmero de maior frequencia: %d\nQuantidade de vezes: %d",NrMais,Qtde);
+					  }
+					getch();
+					break;
+			case 'D': clrscr(); if (tam == 0) printf("\nVetor Vazio");
+						else
+							Consultar(V,tam);
+							break;
+			case 'E': clrscr(); if (tam == 0) printf("\nVetor Vazio");
+								else
+								{
+									
+								}
+			case 'F': clrscr(); if (tam == 0) printf("\nVetor Vazio");
+								else
+								{
+									
+								}
+			
 		}
 		
-			
-		}
-		
-		
-	}while(x!=27);
+	}while (op!=27);
+}
+int main (void)
+{
+	Executar();
 	
 	
-	x = getch();
+	
+	
+	
 	return 0;
 }
