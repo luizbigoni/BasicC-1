@@ -133,9 +133,31 @@ int BuscaExaustiva(int vetor[tf],int tl,int valor)
 			}
 		
 }
+void OrdenarVetor(int vetor[tf],int tl)
+{
+    int i , j,aux;
+    
+    printf("\nIremos ordenar o vetor em ordem crescente!!");
+    for (i = 0 , i < tl - 1 ; i++ )
+        for(j=i+1;j<tl;j++)
+        {
+            if(vetor[i]<vetor[j])
+            {
+               aux = vetor[i];
+               vetor[i] = vetor[j];
+               vetor[j] = aux;
+            }
+        }
+    printf("\n Vetor Ordenado com sucesso!");
+    getch();
+    
+    
+}
+
+// Realizar uma consulta para saber se o numero que deseja esta la
 void Consultar (int Vet[tf],int tl)
 {
-	int i , pos , elemento;
+	int  pos , elemento;
 	printf("\n ## Consultar no Vetor ##");
 	if (Qtde == 0) printf("\nVetor Vazio!\n");
 	else{
@@ -155,6 +177,33 @@ void Consultar (int Vet[tf],int tl)
 		scanf("%d",&elemento);
 		}
 	}
+}
+// Essa função ira excluir o item que você buscou em consulta
+void ExcluirItem(int vetor[tf],&tam)
+{
+    int pos , elemento;
+    printf("\n ## Excluir item ##\n");
+    
+    printf("\nConsultar por: ");
+	scanf ("%d",&elemento);
+	while(elemento>0)
+		{
+			pos = BuscaExaustiva(vetor,tam,elemento);
+			if(pos == -1);
+				printf("\n O numero digitado nao foi encontrado");
+			else{
+			    while(pos < tam)
+				    {
+				        vetor[pos] = vetor[pos+1];
+				        pos++;
+				    }
+				tam--;
+			}
+		getch();
+		printf("\n\nConsultar por: ");
+		scanf("%d",&elemento);
+		}
+    
 }
 // Fazer um executavel para fazer tudo para o main
 void Executar(void)
@@ -194,12 +243,12 @@ void Executar(void)
 			case 'E': clrscr(); if (tam == 0) printf("\nVetor Vazio");
 								else
 								{
-									
+									OrdenarVetor(V,tam);
 								}
 			case 'F': clrscr(); if (tam == 0) printf("\nVetor Vazio");
 								else
 								{
-									
+									ExcluirItem(V,tam);
 								}
 			
 		}
@@ -209,10 +258,5 @@ void Executar(void)
 int main (void)
 {
 	Executar();
-	
-	
-	
-	
-	
 	return 0;
 }
