@@ -213,51 +213,99 @@ void ExcluirItem(int vetor[tf],int &tam)
 		}
     
 }
+void SubConj(int va[tf],int tla,int vb[tf],int tlb,int vc[tf*2],int &tlc)
+{
+	int i;
+	tlc=0;
+	for(i=0;i<tla;i++)
+		if(BuscaExaustiva(vb,tlb,va[i])==-1)
+			if(BuscaExaustiva(vc,tlc,va[i])==-1)
+			{
+				vc[tlc]=va[i];
+				tlc++;
+			}
+		printf("\n Subtração Efetuada!\n");
+		getch();
+}
+void InterConj(int va[tf],int tla,int vb[tf],int tlb,int vc[tf*2],int &tlc)
+{
+	int i;
+	tlc=0;
+	for(i=0;i<tla;i++)
+		if(BuscaExaustiva(vb,tlb,va[i])!=-1) // Se achou!
+			if(BuscaExaustiva(vc,tlc,va[i])==-1)  // Se não achou!
+			{
+				vc[tlc]=va[i];
+				tlc++;
+			}
+		printf("\n Subtração Efetuada!\n");
+		getch();
+}
 // Fazer um executavel para fazer tudo para o main
 void Executar(void)
 {
-	int V[tf] ,tam=0,Qtde,NrMais,num;
+	int V1[tf],V2[tf] ,tam1=0,tam2=0 ,Qtde,NrMais,num,tam3=0,V3[tf*2];
 	char op;
 	do
 	{
 		op = CriarMenu();
 		switch(op)
 		{
-			case 'A': if(tam==tf) printf("\nVetor Cheio\n");
+			case 'A': if(tam1==tf) printf("\nVetor Cheio\n");
 						else
 						{  clrscr();
-							LeValor(V,tam);
+							LeValor(V1,tam1);
 							printf("\nElementos Inseridos\n");
 						}
 					getch();
 					break;
 			
-			case 'B': clrscr();ExibirVetor(V,tam);
+			case 'B': clrscr();ExibirVetor(V1,tam1);
 					  break;
 			
 			
-			case 'C': clrscr();if (tam == 0) printf("\nVetor Vazio , nao sera possivel calcular a frequencia");
+			case 'C': clrscr();if (tam1 == 0) printf("\nVetor Vazio , nao sera possivel calcular a frequencia");
 					  else
 					  {
-					  	Frequencia(V,tam,NrMais,Qtde);
+					  	Frequencia(V1,tam1,NrMais,Qtde);
 					  	printf("\nNÃºmero de maior frequencia: %d\nQuantidade de vezes: %d",NrMais,Qtde);
 					  }
 					getch();
 					break;
-			case 'D': clrscr(); if (tam == 0) printf("\nVetor Vazio");
+			case 'D': clrscr(); if (tam1 == 0) printf("\nVetor Vazio");
 						else
-							Consultar(V,tam);
+							Consultar(V1,tam1);
 							break;
-			case 'E': clrscr(); if (tam == 0) printf("\nVetor Vazio");
+			case 'E': clrscr(); if (tam1 == 0) printf("\nVetor Vazio");
 								else
 								{
-									OrdenarVetor(V,tam);
+									OrdenarVetor(V1,tam1);
 								}
-			case 'F': clrscr(); if (tam == 0) printf("\nVetor Vazio");
+			case 'F': clrscr(); if (tam1 == 0) printf("\nVetor Vazio");
 								else
 								{
-									ExcluirItem(V,tam);
+									ExcluirItem(V1,tam1);
 								}
+			case 'G': clrscr(); printf("\nExec.5a\n");
+								printf("\n Vetor 1:\n");
+								LeValor(V1,tam1);
+								printf("\n Vetor 1:\n");
+								LeValor(V2,tam2);
+								SubConj(V1,tam1,V2,tam2,V3,tam3);
+								clrscr();
+								printf("\n Resultado Subtração:\n");
+								ExibirVetor(V3,tam3);
+								break;
+			case 'H': clrscr();printf("\nExec.5b\n");
+								printf("\n Vetor 1:\n");
+								LeValor(V1,tam1);
+								printf("\n Vetor 1:\n");
+								LeValor(V2,tam2);
+								SubConj(V1,tam1,V2,tam2,V3,tam3);
+								clrscr();
+								printf("\n Resultado Intersecção:\n");
+								ExibirVetor(V3,tam3);
+								break;
 			
 		}
 		
