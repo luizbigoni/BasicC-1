@@ -11,7 +11,7 @@ char CriarMenu(void)
 	clrscr();
 	int li , ci , lf , cf;
 	li = ci = 1;
-	lf = 12;
+	lf = 16;
 	cf = 70;
 	gotoxy(ci,li);
 	printf("%c",201);
@@ -54,8 +54,12 @@ char CriarMenu(void)
 	gotoxy(10,8);
 	printf("[F] Excluir Elemento");
 	gotoxy(10,9);
-	printf("[ESC] Sair");
+	printf("[G] SubConj");
 	gotoxy(10,10);
+	printf("[H] Intersecção");
+	gotoxy(10,11);
+	printf("[ESC] Sair");
+	gotoxy(10,12);
 	printf(" OPCAO : ");
 	
 	
