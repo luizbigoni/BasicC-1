@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
-#define tf 100
+#define tf 10
 
 // Menuzinho com borda  CLEAN
 char CriarMenu(void)
@@ -78,7 +78,7 @@ void ExibirVetor (int vetor[tf],int tl)
 }
 
 
-// Por valor é sem o & e referencia usa o &
+// Por valor Ã© sem o & e referencia usa o &
 void Frequencia (int vetor[tf],int tl,int &valor,int &QtdeVezes)
 {
 	QtdeVezes =0;
@@ -100,7 +100,7 @@ void Frequencia (int vetor[tf],int tl,int &valor,int &QtdeVezes)
 	}	
 }
 }
-// TODO VETOR É PASSADO POR REFERENCIA , OU SEJA NÃO PRECISA DE & , SE COLOCAR VAI DAR ERROR !!!!
+// TODO VETOR Ã‰ PASSADO POR REFERENCIA , OU SEJA NÃƒO PRECISA DE & , SE COLOCAR VAI DAR ERROR !!!!
 void LeValor (int vet[tf],int &tl)
 {
 	int aux;
@@ -110,13 +110,21 @@ void LeValor (int vet[tf],int &tl)
 	while(tl<tf && aux > 0)
 	{
 		vet[tl] = aux;
+		
 		tl++;
-		printf("\nDigite um numeros no vetor: ");
-		printf ("Vetor[%d]: ",tl);
-		scanf("%d",&aux);
+		if(tl>=tf)
+		{
+			aux=0;
+		}
+		else
+		{
+			printf("\nDigite um numeros no vetor: ");
+			printf ("Vetor[%d]: ",tl);
+			scanf("%d",&aux);
+		}
 	}
 }
-// Consulta Exaustiva é ver 1 por 1
+// Consulta Exaustiva Ã© ver 1 por 1
 int BuscaExaustiva(int vetor[tf],int tl,int valor)
 {
 		int i;
@@ -138,10 +146,10 @@ void OrdenarVetor(int vetor[tf],int tl)
     int i , j,aux;
     
     printf("\nIremos ordenar o vetor em ordem crescente!!");
-    for (i = 0 , i < tl - 1 ; i++ )
+    for (i = 0 ; i < tl - 1 ; i++ )
         for(j=i+1;j<tl;j++)
         {
-            if(vetor[i]<vetor[j])
+            if(vetor[i]>vetor[j])
             {
                aux = vetor[i];
                vetor[i] = vetor[j];
@@ -159,27 +167,27 @@ void Consultar (int Vet[tf],int tl)
 {
 	int  pos , elemento;
 	printf("\n ## Consultar no Vetor ##");
-	if (Qtde == 0) printf("\nVetor Vazio!\n");
+	if (tl == 0) printf("\nVetor Vazio!\n");
 	else{
 		printf("\nConsultar por: ");
 		scanf ("%d",&elemento);
 		while(elemento>0)
 		{
 			pos = BuscaExaustiva(Vet,tl,elemento);
-			if(pos == -1);
+			if(pos == -1)
 				printf("\n O numero digitado nao foi encontrado");
-			else{
+			else
 				printf("\nElemento [%d] encontrado na pos [%d]");
 				
-			}
+			
 		getch();
 		printf("\n\nConsultar por: ");
 		scanf("%d",&elemento);
 		}
 	}
 }
-// Essa função ira excluir o item que você buscou em consulta
-void ExcluirItem(int vetor[tf],&tam)
+// Essa funÃ§Ã£o ira excluir o item que vocÃª buscou em consulta
+void ExcluirItem(int vetor[tf],int &tam)
 {
     int pos , elemento;
     printf("\n ## Excluir item ##\n");
@@ -189,7 +197,7 @@ void ExcluirItem(int vetor[tf],&tam)
 	while(elemento>0)
 		{
 			pos = BuscaExaustiva(vetor,tam,elemento);
-			if(pos == -1);
+			if(pos == -1)
 				printf("\n O numero digitado nao foi encontrado");
 			else{
 			    while(pos < tam)
@@ -232,7 +240,7 @@ void Executar(void)
 					  else
 					  {
 					  	Frequencia(V,tam,NrMais,Qtde);
-					  	printf("\nNúmero de maior frequencia: %d\nQuantidade de vezes: %d",NrMais,Qtde);
+					  	printf("\nNÃºmero de maior frequencia: %d\nQuantidade de vezes: %d",NrMais,Qtde);
 					  }
 					getch();
 					break;
