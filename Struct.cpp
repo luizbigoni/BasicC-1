@@ -78,6 +78,9 @@ struct	TpData
 	int d,m,a;
 };
 
+
+
+
 struct TpProduto
 {
 	int cod,Estoque;
@@ -85,6 +88,37 @@ struct TpProduto
 	char Descr[tf];  // Descricao
 	float Preco;
 };
+
+char Menu(void)
+{
+	printf("\n[A] Cadastrar Produtos");
+	printf("\n[B] Relatorio de produtos");
+	printf("\n[C] Ordenar Produtor");
+	printf("\n[D] Excluir Produtos");
+	printf("\n[ESC] Sair");
+	printf("\n\nOpcao Desejada: ");
+	return toupper(getche());
+	
+}
+
+
+
+int BuscaCodExaust(tpProduto Tab[tf], int tl , int CodProd)
+{
+	int i=0;
+	while(i<tl && CodProd !=Tab[i].)
+		i++;
+	
+	
+	if (i<tl)
+		return i;
+	else
+		return -1;
+}
+
+
+
+
 void CadProd(TpProduto TABProd[tf], int &tlp)
 {
 	int AuxCod;
@@ -92,23 +126,61 @@ void CadProd(TpProduto TABProd[tf], int &tlp)
 	printf("Cod do produto: ");scanf("%d",AuxCod);
 	while(tlp<tf && AuxCod>0)
 	{
-		TABProd[tlp].cod = AuxCod;
-		printf("\nDescricao: "); fflush(stdin);
-		gets(TABProd[tlp].Descr);
-		printf("\nQtde em Estoque: ");
-		scanf("%d",&TABProd[tlp].Estoque);
-		printf("\nPreco: R$");
-		scanf("%f",&TABProd[tlp].Preco);
-		printf("\nData de Validade[dd mm aaaa]");
-		scanf("%d%d%d",&TABProp[tlp].Valid.d,
-					   &TABProp[tlp].Valid.m,
-					   &TABProp[tlp].Valid.a);
-		tlp++;
-		printf("\n Cadastro de produtos \n");
-		printf("Cod do produto: ");scanf("%d",AuxCod);
+		pos = BuscaCodExaust(TABProd,tlp,AuxCod);
+		if (pos==-1)
+		{
+	
+			TABProd[tlp].cod = AuxCod;
+			printf("\nDescricao: "); fflush(stdin);
+			gets(TABProd[tlp].Descr);
+			printf("\nQtde em Estoque: ");
+			scanf("%d",&TABProd[tlp].Estoque);
+			printf("\nPreco: R$");
+			scanf("%f",&TABProd[tlp].Preco);
+			printf("\nData de Validade[dd mm aaaa]");
+			scanf("%d%d%d",&TABProp[tlp].Valid.d,
+						   &TABProp[tlp].Valid.m,
+						   &TABProp[tlp].Valid.a);
+			tlp++;
+			printf("\n Cadastro de produtos \n");
+			printf("Cod do produto: ");scanf("%d",AuxCod);
+		}
+		else
+		{
+			printf("\nProdto Cadastrado!\n");
+			printf(" Produto [%d] - Descricao: [%s] \n\n",pos,TABProd[pos].Descr)
+		}
 	}
 }
-void Relatoro(TpProduto TABProd[tf],int tl)
+
+
+void OrdenarProduto (tpProduto TAB[TF], int tl)
+{
+	tpProduto RegAux; // Não Coloca () ou [] por que vai armazenar somente uma linha, nesse caso a linha de descrição
+	if(tl == 0)
+	{
+		printf("\nNao ha dados para ordenar");
+	}
+	else
+	{
+	
+		for(i=0; i<tl-1;i++)
+			for(j=i+1;j<tl;j++)
+				if(stricmp(TAB[i].Descr,TAB[j].Descr)>0)
+				{
+					RegAux = TAB[i];
+					TAB[i] = TAB[j];
+					TAB[j] = RegAux;
+							
+				}
+			printf("\nProdutor ordenados");
+	}
+}
+
+
+
+
+void Relatorio(TpProduto TABProd[tf],int tl)
 {
 	int i;
 	for(i=0;i<tl;i++)
@@ -122,13 +194,32 @@ void Relatoro(TpProduto TABProd[tf],int tl)
 		&TABProp[i].preco);
 	}
 }
+
+
+
+
+
+
 int main(void)
 {
 	TpProduto Prod[tf];
 	int tam=0;
-	CadProd(Prod,tam);
-	Relatorio(Prod,tam);
+	char opcao;
+	
+	do
+	{
+		opcao = Menu();
+		switch(opcao)
+		{
+			case 'A': CadProd(Prod,tam);.
+					   break;
+			case 'B':Relatorio(Prod,tam);
+					 break;
+			case 'C': OrdenarProduto(Prod,tam);
+						break;
+				
+			case 'D':
+		}
+	}
 	return 0;
 }
-
-
