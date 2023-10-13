@@ -7,16 +7,21 @@
 
 #define TF 20
 
-struct tpData
+struct tpDataP
 {
 	int d,m,a;
 };
+struct tpDataV
+{
+	int d,m,a;
+};
+
 
 struct tpProduto
 {
 	
 	int Cod,Estoque;
-	tpData Valid;
+	tpDataP Valid;
 	char Descr[TF];
 	float Preco;
 	int CodForn;
@@ -40,7 +45,7 @@ struct tpFornecedor
  {
  	int CodVenda,CPF;
  	float TotVenda;
- 	tpData Data;
+ 	tpDataV Data;
  };
  
  struct tpVendasProd
@@ -49,22 +54,43 @@ struct tpFornecedor
  	float ValorUnitario;
  };
  
+ 
+ 
+ 
+void limparTela(void);
+void limparTelaRelatorio(void);
+
+void InserirDadosProdutos(tpProduto TabProd[TF], int &TLP);
+void InserirDadosFornecedor(tpFornecedor TabForn[TF], int &TLF);
+void InserirDadosClientes(tpCliente TabCli[TF], int &TLC);
+
 void RealizarVendas(tpVendas TabVendas[1000], int &TLV, tpCliente TabCli[TF],int TLC, tpProduto TabProd[TF],int TLP, tpVendasProd TabVendasProd[1000],int &TLVP);
-void ConsultaCliente(tpCliente tab[TF], int TLC);
-void ConsultaForncedor(tpFornecedor tab[TF], int TLF);
+
+void Relatorio(tpProduto TabProd[TF],int TLP, tpFornecedor TabForne[TF], int TLF, tpVendas tabV[TF], int TLV, tpVendasProd TabVendaProd[TF], int TLVP);
+
 void ConsultaProd(tpProduto tab[TF], int TLP);
+void ConsultaForncedor(tpFornecedor tab[TF], int TLF);
 void ConsultaCliente(tpCliente tab[TF], int TLC);
+
+int BuscaCli(tpCliente Tab[TF], int TL, int CPFCli);
 void CadastroCliente(tpCliente TabCliente[TF], int &TLC);
+int BuscaForn(tpFornecedor Tab[TF], int TL, int CodForn);
 void CadastroFornecedor(tpFornecedor TabForne[TF], int &TLF);
-void CadastroProd(tpProduto TabProd[TF],int &TLP,tpFornecedor TabForn[TF],int TLF);
 int BuscaCod(tpProduto Tab[TF], int TL, int CodProd);
+void CadastroProd(tpProduto TabProd[TF],int &TLP,tpFornecedor TabForn[TF],int TLF);
+
+void ExclusaoCliente(tpCliente TabCliente[TF], int &TLC);
+void ExclusaoProdutos(tpProduto TabProd[TF], int &TLP);
+void ExclusaoFornecedor(tpFornecedor TabForn[TF], int &TLF);
+
 char MenuPrincipal(void);
 char subProdutos(void);
 char subGerenciamento(void);
 char EscolhaGerenciamento(void);
+char subInserir(void);
 void Moldura (int ci, int li, int cf, int lf, int cort, int corf);
 void formulario(void);
-void limparTela(void);
+
 
 int main(void)
 {
@@ -89,7 +115,7 @@ int main(void)
 		op = MenuPrincipal();
 		switch(op)
 		{
-			case 'A':	opsub=subProdutos();
+			case 'A':	opsub=subProdutos(); //VENDAS
 						switch(opsub)
 						{
 							case 'A': limparTela(); //Produtos a venda
@@ -102,10 +128,9 @@ int main(void)
 							case 'D': //finalizar compra
 										break;
 						}
-						
-					  break;
+						break;
 					  
-			case 'B':	opsub = subGerenciamento();
+			case 'B':	opsub = subGerenciamento(); //GERENCIAMENTO
 						switch(opsub)
 						{
 							case 'A':	limparTela();
@@ -146,11 +171,16 @@ int main(void)
 							case 'C': opEscolha = EscolhaGerenciamento(); //EXCLUSAO
 										switch(opEscolha)
 										{
-											case 'A': //Produtos
+											case 'A':	limparTela();
+														ExclusaoProdutos(Prod, TLP);//Produtos
 														break;
-											case 'B': //fornecedor
+														
+											case 'B':	limparTela();
+														ExclusaoFornecedor(Fornecedor,TLF);//fornecedoR
 														break;
-											case 'C': //cliente
+														
+											case 'C':	limparTela();
+														ExclusaoCliente(Cliente,TLC);//cliente
 														break;
 										}
 										break;
@@ -166,13 +196,30 @@ int main(void)
 										}
 										break;
 						}
-					  break;
+						break;
 					  
-			case 'C': ;
-					  break;
+			case 'C':	limparTelaRelatorio(); //RELATORIO
+						Relatorio(Prod, TLP, Fornecedor, TLF, Vendas, TLV,VendasProd, TLVP);
+						break;
+			
+			case 'D':	opsub=subInserir(); //INSERIR DADOS
+						switch(opsub);
+						{
+							case 'A':	limparTela();
+										InserirDadosProdutos(Prod,TLP); //produtos
+										break;
+										
+							case 'B':	limparTela();
+										InserirDadosFornecedor(Fornecedor,TLF); //fornecedor
+										break;
+										
+							case 'C':	limparTela();
+										InserirDadosClientes(Cliente,TLC); //cliente
+										break;								
+						}
+						break;
 		}
 	}while(op!=27);
-	
 	return 0;
 }
 
@@ -189,6 +236,355 @@ void limparTela(void) //função de limpar tela
 		}
 	}
 }
+
+
+
+
+
+void limparTelaRelatorio(void)//limpar a tela do relatorio
+{
+	int i , j;
+	
+	for(i = 7;i<26;i++)
+	{	for(j= 2;j<79;j++)
+		{
+			gotoxy(j,i);
+			printf(" ");
+		}
+	}
+}
+
+void Relatorio(tpProduto TabProd[TF],int TLP, tpFornecedor TabForne[TF], int TLF, tpVendas tabV[TF], int TLV, tpVendasProd TabVendaProd[TF], int TLVP) //gerar relatorio
+{
+	int i=0,aux,D,R,F;
+	
+	gotoxy(27,4);
+	printf("## Relatorio ##");
+	while(i<TLVP)
+	{	
+		printf("Codigo de venda: %d", TabVendaProd[i].CodVenda);
+		aux=TabVendaProd[i].CodVenda;
+		printf("Produtos:");
+		while(TabVendaProd[i].CodVenda==aux)
+		{
+			D=BuscaCod(TabProd, TLP, TabVendaProd[i].CodProd);
+			R=TabVendaProd[i].ValorUnitario*TabVendaProd[i].Qtde;
+			F=BuscaForn(TabForne, TLF, TabProd[D].CodForn);
+			printf(" %d   %s   %d   RS:%f   %s",TabVendaProd[i].CodProd, TabProd[D].Descr, TabVendaProd[i].Qtde, R, TabForne[F].Nome);
+			i++;	
+		}
+	}
+}
+
+
+
+
+
+void ExclusaoProdutos(tpProduto TabProd[TF], int &TLP) //exclusao de produtos
+{
+	int i, auxCod, op; 
+	
+	gotoxy(40 ,9);
+	printf("## Exclusao de produto ##");
+	do
+	{
+		gotoxy(34, 12);
+		printf("Qual produto deseja excluir(codigo): ");
+		scanf("%d", &auxCod);
+		while(i<TLP && TabProd[i].Cod!=auxCod)
+		{
+			i++;
+			if(i<TLP)	
+			{
+				gotoxy(34, 14);
+				printf("Codigo encontrado!");
+				gotoxy(34, 15);
+				printf("Codigo: %d",TabProd[i].Cod);
+				gotoxy(34, 16);
+				printf("Descricao: %s", TabProd[i].Descr);
+				gotoxy(34, 17);
+				printf("Estoque: %d", TabProd[i].Estoque);
+				gotoxy(34, 18);
+				printf("Preco: %f", TabProd[i].Preco);
+				gotoxy(34, 19);
+				printf("Validade: %d %d %d", TabProd[i].Valid.d, TabProd[TLP].Valid.m, TabProd[TLP].Valid.a);
+				gotoxy(34, 20);
+				printf("Confirmar exclusao: S/N");
+				if(toupper(getch())=='S')
+				{
+					for(; i<TLP-1; i++)
+						TabProd[i]=TabProd[i+1];
+					TLP--;	
+					gotoxy(34, 21);
+					printf("Produto excluido!");
+				}
+				else
+				{
+					gotoxy(34, 21);
+					printf("Exclusao cancelada!");
+				}	
+			}
+			else
+			{
+				gotoxy(34, 14);
+				printf("Produto nao encontrado!");
+			}
+		}	
+		printf("Deseja excluir outro produto? S/N");
+		scanf("%c", &op);
+		if(op=='S')
+			limparTela();
+		//else
+			//tem q fazer a funcao para voltar pro menu ainda!!!!!!!!!!!!!!!!!!!!!
+	}while(toupper(getche(op))!='N');
+}
+
+void ExclusaoFornecedor(tpFornecedor TabForn[TF], int &TLF) //exclusao de fornecedor
+{
+	int i, auxForn, op,auxCod; 
+	
+	gotoxy(40 ,9);
+	printf("## Exclusao de fornecedor ##");
+	do
+	{
+		gotoxy(34, 12);
+		printf("Qual fornecedor deseja excluir(codigo): ");
+		scanf("%d", &auxForn);
+		while(i<TLF && TabForn[i].Cod!=auxCod)
+		{
+			i++;
+			if(i<TLF)	
+			{
+				gotoxy(34, 14);
+				printf("Codigo encontrado!");
+				gotoxy(34, 15);
+				printf("Codigo: %d",TabForn[i].Cod);
+				gotoxy(34, 16);
+				printf("Nome: %s", TabForn[i].Nome);
+				gotoxy(34, 17);
+				printf("Cidade: %s", TabForn[i].Cid);
+				gotoxy(34, 18);
+				printf("Confirmar exclusao: S/N");
+				op = toupper(getch());
+				if(op=='S')
+				{
+					for(; i<TLF-1; i++)
+						TabForn[i]=TabForn[i+1];
+					TLF--;	
+					gotoxy(34, 19);
+					printf("Fornecedor excluido!");
+				}
+				else
+				{
+					gotoxy(34, 19);
+					printf("Exclusao cancelada!");
+				}	
+			}
+			else
+			{
+				gotoxy(34, 14);
+				printf("Fornecedor nao encontrado!");
+			}
+		}	
+		printf("Deseja excluir outro produto? S/N");
+		scanf("%c", &op);
+		if(op=='S')
+			limparTela();
+		//else
+			//tem q fazer a funcao para voltar pro menu ainda!!!!!!!!!!!!!!!!!!!!!
+	}while(op!='N');	
+}
+
+void ExclusaoCliente(tpCliente TabCliente[TF], int &TLC) //exclusao de clientes
+{
+	int i, auxCli, op; 
+	
+	gotoxy(40 ,9);
+	printf("## Exclusao de cliente ##");
+	do
+	{
+		gotoxy(34, 12);
+		printf("Qual cliente deseja excluir(CPF): ");
+		scanf("%d", &auxCli);
+		while(i<TLC && TabCliente[i].CPF!=auxCli)
+		{
+			i++;
+			if(i<TLC)	
+			{
+				gotoxy(34, 14);
+				printf("CPF encontrado!");
+				gotoxy(34, 15);
+				printf("CCPF: %d",TabCliente[i].CPF);
+				gotoxy(34, 16);
+				printf("Nome: %s", TabCliente[i].Nome);
+				gotoxy(34, 17);
+				printf("Quantidade de compras: %d", TabCliente[i].QtdeCompras);
+				gotoxy(34, 18);
+				printf("Valor total: %f", TabCliente[i].ValorTotal);
+				gotoxy(34, 19);
+				printf("Confirmar exclusao: S/N");
+				op = toupper(getch());
+				if(op=='S')
+				{
+					for(; i<TLC-1; i++)
+						TabCliente[i]=TabCliente[i+1];
+					TLC--;	
+					gotoxy(34, 20);
+					printf("Cliente excluido!");
+				}
+				else
+				{
+					gotoxy(34, 20);
+					printf("Exclusao cancelada!");
+				}	
+			}
+			else
+			{
+				gotoxy(34, 14);
+				printf("Cliente nao encontrado!");
+			}
+		}	
+		printf("Deseja excluir outro cliente? S/N");
+		scanf("%c", &op);
+		if(op=='S')
+			limparTela();
+		//else
+			//tem q fazer a funcao para voltar pro menu ainda!!!!!!!!!!!!!!!!!!!!!
+	}while(toupper(getche(op))!='N');
+	
+}
+
+
+
+
+
+void InserirDadosProdutos(tpProduto TabProd[TF], int &TLP) //inserir produtos
+{
+	TabProd[TLP].Cod = 1000;
+	strcpy(TabProd[TLP].Descr,"Arroz");
+	TabProd[TLP].Estoque = 50;
+	TabProd[TLP].Preco = 25;
+	TabProd[TLP].Valid.d = 15;
+	TabProd[TLP].Valid.m = 8;
+	TabProd[TLP].Valid.a = 2025;
+	TabProd[TLP].CodForn = 1000;
+	TLP++;
+	
+	TabProd[TLP].Cod = 2000;
+	strcpy(TabProd[TLP].Descr,"Feijao");
+	TabProd[TLP].Estoque = 15;
+	TabProd[TLP].Preco = 10.56;
+	TabProd[TLP].Valid.d = 18;
+	TabProd[TLP].Valid.m = 11;
+	TabProd[TLP].Valid.a = 2026;
+	TabProd[TLP].CodForn = 1000; 
+	TLP++;
+	
+	TabProd[TLP].Cod = 7000;
+	strcpy(TabProd[TLP].Descr,"Batata");
+	TabProd[TLP].Estoque = 150;
+	TabProd[TLP].Preco = 3.99;
+	TabProd[TLP].Valid.d = 23;
+	TabProd[TLP].Valid.m = 10;
+	TabProd[TLP].Valid.a = 2023;
+	TabProd[TLP].CodForn = 2000;
+	TLP++;
+	
+	TabProd[TLP].Cod = 8000;
+	strcpy(TabProd[TLP].Descr,"Couve");
+	TabProd[TLP].Estoque = 200;
+	TabProd[TLP].Preco = 1.99;
+	TabProd[TLP].Valid.d = 30;
+	TabProd[TLP].Valid.m = 10;
+	TabProd[TLP].Valid.a = 2023;
+	TabProd[TLP].CodForn = 2000;
+	TLP++;
+	
+	TabProd[TLP].Cod = 9000;
+	strcpy(TabProd[TLP].Descr,"Cenoura");
+	TabProd[TLP].Estoque = 300;
+	TabProd[TLP].Preco = 5.99;
+	TabProd[TLP].Valid.d = 05;
+	TabProd[TLP].Valid.m = 11;
+	TabProd[TLP].Valid.a = 2023;
+	TabProd[TLP].CodForn = 2000;
+	TLP++;
+	
+	gotoxy(25,25);
+	printf("*** Dados inseridos! ***");
+	getch();
+}
+
+void InserirDadosFornecedor(tpFornecedor TabForn[TF], int &TLF) //inserir fornecedores
+{
+	TabForn[TLF].Cod = 1000;
+	strcpy(TabForn[TLF].Nome,"Luiz");
+	strcpy(TabForn[TLF].Cid,"São Paulo");
+	TLF++;
+	
+	TabForn[TLF].Cod = 2000;
+	strcpy(TabForn[TLF].Nome,"Vitor");
+	strcpy(TabForn[TLF].Cid,"Osasco");
+	TLF++;
+	
+	TabForn[TLf].Cod = 3000;
+	strcpy(TabForn[TLF].Nome,"João");
+	strcpy(TabForn[TLF].Cid,"Presidente Prudente");
+	TLF++;
+	
+	TabForn[TLf].Cod = 4000;
+	strcpy(TabForn[TLF].Nome,"Gabriela");
+	strcpy(TabForn[TLF].Cid,"Santos");
+	TLF++;
+	
+	TabForn[TLf].Cod = 5000;
+	strcpy(TabForn[TLF].Nome,"Arthur");
+	strcpy(TabForn[TLF].Cid,"São Paulo");
+	TLP++;
+	
+	gotoxy(25,25);
+	printf("*** Dados inseridos! ***");
+	getch();	
+}
+
+void InserirDadosClientes(tpCliente TabCli[TF], int &TLC) //inserir clientes
+{
+	TabCli[TLC].CPF = 12345678998;
+	strcpy(TabCli[TLC].Nome,"Roberto Pereira");
+	TabCli[TLC].QtdeCompras = 50;
+	TabCli[TLC].ValorTotal = 5000;
+	TLC++;
+	
+	TabCli[TLC].CPF = 98765432112;
+	strcpy(TabCli[TLC].Nome,"Adriana Silva");
+	TabCli[TLC].QtdeCompras = 100;
+	TabCli[TLC].ValorTotal = 14570;
+	TLC++;
+	
+	TabCli[TLC].CPF = 15975312325;
+	strcpy(TabCli[TLC].Nome,"Tania Lamberti");
+	TabCli[TLC].QtdeCompras = 3;
+	TabCli[TLC].ValorTotal = 200;
+	TLC++;
+	
+	TabCli[TLC].CPF = 14886325878;
+	strcpy(TabCli[TLC].Nome,"Roberto Carlos");
+	TabCli[TLC].QtdeCompras = 50;
+	TabCli[TLC].ValorTotal = 7520;
+	TLC++;
+	
+	TabCli[TLC].CPF = 32198765456;
+	strcpy(TabCli[TLC].Nome,"Adriano Souza");
+	TabCli[TLC].QtdeCompras = 1;
+	TabCli[TLC].ValorTotal = 1000;
+	TLC++;
+	 
+	gotoxy(25,25);
+	printf("*** Dados inseridos! ***");
+	getch();
+}
+
+
 
 
 
@@ -314,9 +710,9 @@ void ConsultaProd(tpProduto tab[TF], int TLP) //consulta produtos
 		gotoxy(34, 16);
 		printf("Data de validade:%d/%d/%d", tab[x].Valid.d, tab[x].Valid.m, tab[x].Valid.a);
 		x++;
-	gotoxy(40, 20);
-	printf("[-->]-proximo produto.");
-	scanf("%d", &aux);			
+		gotoxy(40, 20);
+		printf("[-->]-proximo produto.");
+		scanf("%d", &aux);			
 	}
 	if(TLP<0)
 	{
@@ -324,6 +720,7 @@ void ConsultaProd(tpProduto tab[TF], int TLP) //consulta produtos
 		printf("Nao ha produtos a serem consultados!");
 	}
 }
+
 
 
 
@@ -349,7 +746,7 @@ void CadastroCliente(tpCliente TabCliente[TF], int &TLC) // cadastro Cliente
 	gotoxy(34, 12);
 	printf("CPF do Cliente: ");
 	scanf("%d", &AuxCod);
-	while(TLC<TF && AuxCod>0)
+	while(TLC<TF && AuxCod>0 && )
 	{
 		pos = BuscaCli(TabCliente,TLC,AuxCod);
 		if(pos==-1)
@@ -402,18 +799,6 @@ int BuscaForn(tpFornecedor Tab[TF], int TL, int CodForn) //busca cadastro
 	else
 		return -1;
 }
-
-/*int BuscaVendasProd(tpVendasProd Tab[TF], int TLVP ,int CodVenda) //Busca VendasProd Para exclusão
-{
-	int a=0;
-	while (a<TLVP && CodVenda != Tab[a].CodVenda)
-				a++;
-	
-	if (a<TLVP)
-		return a;
-	else
-		return -1;
-}*/
 
 void CadastroFornecedor(tpFornecedor TabForne[TF], int &TLF) // cadastro de fornecedor
 {
@@ -568,6 +953,68 @@ void CadastroProd(tpProduto TabProd[TF],int &TLP,tpFornecedor TabForn[TF],int TL
 
 
 
+int BuscaVenda(tpVenda Tab[TF], int TLV ,int CodVenda) //Busca VendasProd Para exclusão
+{
+	int a=0;
+	while (a<TLV && CodVenda != Tab[a].CodVenda)
+				a++;
+	
+	if (a<TLV)
+		return a;
+	else
+		return -1;
+}
+
+void ExclusaoVendas(tpVendas Vendas[TF],int &TLV,tpCliente Cli[TF],int &TLC,tpVendasProd VendasProd[TF],int &TLVP)
+{
+	int posC , posVP,auxcod,posV,auxCPF,auxValor;
+	
+	printf("Digite o Codigo da Venda");
+	scanf("%d",auxcod);
+	posV = BuscaVenda(Vendas,TLV,auxcod);
+	if(posV<TLV)
+	{
+		auxCPF = Vendas[posV].CPF;
+		posC = BuscaCli(Cli,TLC);
+		if(posC<TLC)
+		{
+			auxValor = Vendas[posV].TotVenda;
+			while(TLV > posV)
+			{
+					  Vendas[posV] = Vendas[posV+1];
+					  posV++;
+	        }
+	        TLV--;
+	        Cli[posC].ValorTotal -= auxValor;
+			posVP=BuscaVendasProd(VendasProd,TLVP,auxcod);
+			while(posVP<TLVP)
+			{
+				VendasProd[posVP] = VendasProd[posVP + 1]
+				posVP=BuscaVendasProd(VendasProd,TLVP)
+				TLVP--;	
+			}
+		}
+		
+	}
+	else
+	{
+		gotoxy(34,12);
+		printf("Venda não encontrada");
+		
+	}
+}
+
+int BuscaVendasProd(tpVendasProd Tab[TF], int TLVP ,int CodVenda) //Busca VendasProd Para exclusão
+{
+	int a=0;
+	while (a<TLVP && CodVenda != Tab[a].CodVenda)
+				a++;
+	
+	if (a<TLVP)
+		return a;
+	else
+		return -1;
+}
 
 void RealizarVendas(tpVendas TabVendas[1000], int &TLV, tpCliente TabCli[TF],int TLC, tpProduto TabProd[TF],int TLP, tpVendasProd TabVendasProd[1000],int &TLVP) //vendas
 {
@@ -575,34 +1022,15 @@ void RealizarVendas(tpVendas TabVendas[1000], int &TLV, tpCliente TabCli[TF],int
 	 
 	int i=0, x=12,j;
 	char op,OP;
-	gotoxy(40 ,9);
-	//printf("## Produtos a venda ##");
-	/*while(i<TLP)
-	{
-		if(x<16)
-		{
-			gotoxy(34,x);
-			printf("Codigo: %d Descr: %s Preco: %.2f ", TabProd[i].Cod, TabProd[i].Descr, TabProd[i]. Preco);
-			
-			if(i+1<TLP && x<16)
-			{
-				i++;
-				x++;
-				printf("Codigo:%d Descr:%s Preco:%.2f", TabProd[i].Cod, TabProd[i].Descr, TabProd[i]. Preco);
-			}
-			i++;
-			x++;	
-		}
-	}*/
 	
 	gotoxy(40 ,12);
 	printf("Deseja Efetuar a compra? S/N: ");
 	//toupper(getch(op));
 	scanf("%c",&op);
-	toupper(op);
+	op = toupper(getch());
 	if(op == 'S')
 	{
-		int AuxCPF,AuxCodProd,pos,posP,Qtde,CodVenda,CodProd,ValorTotal = 0;
+		int AuxCPF,AuxCodProd,pos,posP,Qtde,CodVenda,CodProd,ValorTotal = 0; //outro int? e pode fazer isso?
 		limparTela();
 		
 		
@@ -616,15 +1044,16 @@ void RealizarVendas(tpVendas TabVendas[1000], int &TLV, tpCliente TabCli[TF],int
 		{
 			while(TLP !=0 && CodProd!=0)
 			{
-				if(TLP>0)
+				if(TLP>0) //esse TLP>0 n pode ta no lugar daquele TLP!=0 dentro do while?
 				{
+					//aqui eu queria fazer tipo uma lista para mostrar todos os produtos que tem para ai o usuario escolher o q quer comprar
 				   gotoxy(34,13);
 				   printf("Qual produto deseja comprar(CodProd): ");
 				   scanf("%d",&AuxCodProd);
 				   posP=BuscaCod(TabProd,TLP,AuxCodProd);
 				   if(posP<TLP) //achou
-				   {
-					   	gotoxy(34,14);
+				   {	
+						gotoxy(34,14);
 					   	printf("Quantos deseja comprar: ");
 					   	scanf("%d",&Qtde);
 					   	if(Qtde < TabProd[posP].Estoque) // Menor que o estoque
@@ -635,11 +1064,14 @@ void RealizarVendas(tpVendas TabVendas[1000], int &TLV, tpCliente TabCli[TF],int
 				   		        printf("Digite a data do dia da compra");
 				   		        scanf("%d %d %d",&TabVendas[TLV].Data.d,&TabVendas[TLV].Data.m,&TabVendas[TLV].Data.a);
 					   			TabVendasProd[TLVP].CodProd = AuxCodProd;
-					   			TabVendasProd[TLVP].CodVenda = TabVendas[TLV-1].CodVenda + 1;
+					   			TabVendasProd[TLVP].CodVenda = TabVendas[TLV].CodVenda;
 					   			TabVendasProd[TLVP].Qtde = Qtde;
 					   			TabVendasProd[TLVP].ValorUnitario = TabProd[posP].Preco;
 					   			ValorTotal = TabVendasProd[TLVP].Qtde * TabVendasProd[TLVP].ValorUnitario;
 						        TLVP++;
+						        TabProd[posP].Estoque -= Qtde;
+						        if(TabProd[posP].Estoque == 0)
+       						         ExclusaoProdutos(TabProd,TLP);
 					   			TabCli[pos].QtdeCompras++;
 					   			gotoxy(34,16);
 					   			printf("Deseja Realizar mais compras?");
@@ -668,17 +1100,18 @@ void RealizarVendas(tpVendas TabVendas[1000], int &TLV, tpCliente TabCli[TF],int
 																   	scanf("%d",&Qtde);
 																   	if(Qtde < TabProd[posP].Estoque) // Menor que o estoque
 												                        {
-																		 	TabVendas[TLV].CodVenda = TabVendas[TLV - 1].CodVenda;
-															   		        TabVendas[TLV].CPF = AuxCPF;
 															   		        gotoxy(34,15);
 															   		        printf("Digite a data do dia da compra");
 															   		        scanf("%d %d %d",&TabVendas[TLV].Data.d,&TabVendas[TLV].Data.m,&TabVendas[TLV].Data.a);
 																   			TabVendasProd[TLVP].CodProd = AuxCodProd;
-																   			TabVendasProd[TLVP].CodVenda = TabVendas[TLV-1].CodVenda;
+																   			TabVendasProd[TLVP].CodVenda = TabVendas[TLV].CodVenda;
 																   			TabVendasProd[TLVP].Qtde = Qtde;
 																   			TabVendasProd[TLVP].ValorUnitario = TabProd[posP].Preco;
 																   			ValorTotal = TabVendasProd[TLVP].Qtde * TabVendasProd[TLVP].ValorUnitario;
 																		        TLVP++;
+																		        TabProd[posP].Estoque -= Qtde;
+																			        if(TabProd[posP].Estoque == 0)
+													       						         ExclusaoProdutos(TabProd,TLP);
 																	   			TabCli[pos].QtdeCompras++;
 																   			gotoxy(34,16);
 																   			printf("Deseja Realizar mais compras?");
@@ -729,9 +1162,7 @@ void RealizarVendas(tpVendas TabVendas[1000], int &TLV, tpCliente TabCli[TF],int
 														          gotoxy(34, 13);
 												  				  printf("Produto não encontrado");
 												     			  getch();
-															   }
-												   	   
-												   		    
+															   } 
 													   }
 													   else
 														  {
@@ -806,25 +1237,25 @@ void RealizarVendas(tpVendas TabVendas[1000], int &TLV, tpCliente TabCli[TF],int
 				   }
 	        }
 		}
-		 else
-			   {
-				   	for(i = 10;i<23;i++)
-						for(j = 29;j<79;j++)
-						{
-							gotoxy(j,i);
-							printf(" ");
-						}
-	              gotoxy(34, 12);
-	  			  printf("Cliente não encontrado");
-	     		  getch();
-			   }
+		else
+		{
+			for(i = 10;i<23;i++)
+				for(j = 29;j<79;j++)
+					{
+						gotoxy(j,i);
+						printf(" ");
+					}
+	        gotoxy(34, 12);
+	  		printf("Cliente não encontrado");
+	     	getch();
+	   }
    }
 }
 
-void ExclusaoVendas(tpVendas Vendas[TF],int TLV,tpCliente Cli[TF],int TLC,tpVendasProd VendasProd[TF],int TLVP)
-{
-	
-}
+
+
+
+
 
 char MenuPrincipal(void) //  menu principal
 {
@@ -832,16 +1263,35 @@ char MenuPrincipal(void) //  menu principal
 	gotoxy(8,10);
 	printf("# # M E N U # #");
 	gotoxy(3,14);
-	printf(" [ A ]-Produtos ");
+	printf(" [ A ]-Produtos a venda ");
 	gotoxy(3,16);
 	printf(" [ B ]-Gerenciamento ");
 	gotoxy(3,18);
 	printf(" [ C ]-Emitir Relatorio ");
+	gotoxy(3,20);
+	printf(" [ D ]-Inserir dados ");
 	gotoxy(8,24);
 	printf(" [ESC]-S A I R");
 	gotoxy(40,25);
 	return toupper(getche());
 
+}
+
+char subInserir(void) //sub menu de inserir dados
+{
+	textcolor(15);
+	gotoxy(45,9);
+	printf("## SUB MENU INSERCAO ##");
+	gotoxy(35,12);
+	printf(" [ A ]-Inserir dados em produtos");
+	gotoxy(35,14);
+	printf(" [ B ]-Inserir dados em fornecedores");
+	gotoxy(35,16);
+	printf(" [ C ]-Inserir dados em clientes");
+	gotoxy(36,22);
+	printf("[ F2 ]-VOLTAR");
+	gotoxy(40,25);
+	return toupper(getche());
 }
 
 char subProdutos(void) //sub menu de produtos 
@@ -862,7 +1312,6 @@ char subProdutos(void) //sub menu de produtos
 	gotoxy(40,25);
 	return toupper(getche());
 }
-//void ExclusãoProd(tpProduto)
 
 char subGerenciamento(void) //sub menu de gerenciamento
 {
@@ -901,7 +1350,6 @@ char EscolhaGerenciamento(void)  //menu de escolha do sub menu gerenciamento
 	return toupper(getche());
 }
 
-
 void Moldura (int ci, int li, int cf, int lf, int cort) //moldura
 { 
 	
@@ -935,7 +1383,7 @@ int i;
 	textbackground(0);	
 }
 
-void formulario(void) // formula
+void formulario(void) // formulario
 {
 	
 	system("cls");
