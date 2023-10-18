@@ -47,6 +47,29 @@ void BubbleSort(int intV[TF],int TL)
 	}
 }
 
+//Seleção Direta
+void SelecaoDireta(int V[TF],int TL)
+{
+	int cont1,cont2,i,PosMaior;
+	for(cont1=0;cont1<TL;cont1++)
+	{
+		i=0;
+		PosMaior=0;
+		for(cont2=0;cont2<TL;cont2++)
+		{
+			if(V[cont2]>i)
+			{
+				i=V[cont2];
+				PosMaior = cont2;
+			}	
+		}
+	
+		V[tl-1] = V[PosMaior];
+		V[cont1]=i;
+		TL--;
+	}
+}
+
 
 // INSERÇÃO DIRETA PARA NAO USAR BUSCA
 void InsercaoDireta(char TAB[5],int tl)
@@ -69,8 +92,8 @@ int main()
 	
 	for(aux=0;aux<TF;aux++,TL++)
 		scanf("%d",&V[aux]);
-	BubbleSort(V,TL);
-	
+	//BubbleSort(V,TL);
+	SelecaoDireta(V,TL);
 	/*while(TL<TF&&aux!=0)
 	{
 		V[TL] = aux;
