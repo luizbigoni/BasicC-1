@@ -44,5 +44,5 @@ void Exibir(void)
 			printf("\n Salario: %.2f\n"F.Salario);
 		}
 	}
-	
+	fclose(Ptr);
 }
