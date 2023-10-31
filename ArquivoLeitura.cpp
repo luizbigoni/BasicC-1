@@ -35,13 +35,14 @@ void Exibir(void)
 	if(Ptr==NULL)
 		printf("\nErro de Abertura!\n");
 	else
-	{
+	{  //Com entra lido e sai lido ele não vai ler 2 vezes o final para saber
+		fread(&F,sizeof(TpFunc),1,Ptr);
 		while(!feof(Ptr))    // feof retorna em 0 e 1 , primeiro le e depois ve se é final de arquivo , feof pega o valor da ultima leitura ( o 0 e 1 significa que se leu a ultima vez um arquivo que não é final ele continua , até ler de fato o final de arquivo ( EOF )
 		{
-			fread(&F,sizeof(TpFunc),1,Ptr);
 			printf("&F,sizeof(TpFunc),1,Ptr");
 			printf("\n Nome: %s",F.Nome);
 			printf("\n Salario: %.2f\n"F.Salario);
+			fread(&F,sizeof(TpFunc),1,Ptr);
 		}
 	}
 	fclose(Ptr);
