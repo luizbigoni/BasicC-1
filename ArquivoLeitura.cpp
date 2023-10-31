@@ -44,6 +44,7 @@ void Exibir(void)
 			printf("\n Salario: %.2f\n"F.Salario);
 			fread(&F,sizeof(TpFunc),1,Ptr);
 		}
+		fclose(Ptr);
 	}
-	fclose(Ptr);
+	getch();
 }
