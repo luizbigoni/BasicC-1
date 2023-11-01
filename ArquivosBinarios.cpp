@@ -59,7 +59,7 @@ void Exibir(void)
 int BuscaFunc(FILE *ptr, int Mat)
 {
 	TpFunc R;
-	rewind(ptr);
+	rewind(ptr); // invez do rewind poderia usar o fseek , ficaria: fseek(Ptr,0,0)
 	
 	fread(&R,sizeof(TpFunc),1,ptr);
 	while(!feof(ptr) && Mat!R.Matricula)
@@ -88,7 +88,6 @@ void Consultar()
 		{	
 			//fseek (Ponteiro,desl Bytes , modo ( inicio(SEEK_SET) , fim(SEEK_END) , POSIÇÃO CORRENTE(SEEK_CUR) )
 			fseek(PtrFunc,pos,SEEK_SET) // o pos é a quantidade de bytes que a gente precisa , SEEK_SET = 0
-			
 			fread(&Reg,sizeof(TpFunc),1,ptrFunc);
 			printf("\n*** Detalhes do Registro ###\n");
 			printf("Matricula: %d\n",Reg.Matricula);
