@@ -10,19 +10,19 @@ struct TpFunc
 {
 	int Matricula;
 	float Salario;
-	char Nome[30];
+	char Nome[30], Status; //[A]tivo   [I]nativo
 };
 
 int BuscaFunc(FILE *Ptr, int Mat)
 {
 	TpFunc R;
 	rewind(Ptr); //fseek(Ptr,0,0);
-	
+	int achou = 0;
 	fread(&R,sizeof(TpFunc),1,Ptr);
-	while (!feof(Ptr) && Mat!=R.Matricula)
+	while (!feof(Ptr) && !(Mat!=R.Matricula && R.Status!='A'))
 			fread(&R,sizeof(TpFunc),1,Ptr);
 	
-	if (Mat==R.Matricula) //!feof(Ptr))
+	if (!feof(Ptr)) //!feof(Ptr))
 		return ftell(Ptr)-sizeof(TpFunc);
 	else
 		return -1;
@@ -43,6 +43,7 @@ void Cadastro(void)
 		gets(R.Nome);
 		printf("Salario R$: ");
 		scanf("%f",&R.Salario);
+		R.Status = 'A'; // A de Ativo
 		fwrite(&R,sizeof(TpFunc),1,PtrArq);
 		printf("\n\nMatricula: ");
 		scanf("%d",&R.Matricula);
@@ -52,19 +53,23 @@ void Cadastro(void)
 
 void Exibir(void)
 {
-	TpFunc R;
+	TpFunc Reg;
 	FILE *Ptr = fopen("func.dat","rb");
 	if(Ptr==NULL)
 		printf("\nErro de Abertura!\n");
 	else
 	{
 		printf("\n### Conteudo do Arquivo ###\n");
-		fread(&R,sizeof(TpFunc),1,Ptr);
+		fread(&Reg,sizeof(TpFunc),1,Ptr);
 		while(!feof(Ptr))
 		{
-			printf("\nMatricula [%d] - %s",R.Matricula,R.Nome);
-			printf("\nSalario: %.2f",R.Salario);
-			fread(&R,sizeof(TpFunc),1,Ptr);
+			if(Reg.status==a)
+			{
+				printf("\nMatricula [%d] - %s",Reg.Matricula,R.Nome);
+				printf("\nNome %s",Reg.Nome);
+				printf("\nSalario: %.2f",Reg.Salario);
+			}
+			fread(&Reg,sizeof(TpFunc),1,Ptr);
 		}
 		fclose(Ptr);
 	}
@@ -80,6 +85,9 @@ char Menu(void)
 	printf("\n[C] - Consultar Funcionarios");
 	printf("\n[D] - Alterar Funcionarios");
 	printf("\n[E] - Ordenar Funcionarios");
+	printf("\n[F] - Exclusao Fisica de Funcionarios");
+	printf("\n[G] - Exclusao Logica de Funcionarios");
+	printf("\n[H] - Recuperar Registro deletado Logicamente");
 	printf("\n[ESC] - Finalizar");
 	printf("\nOpcao desejada: \n");
 	return toupper(getche());
@@ -115,7 +123,8 @@ void Consultar()
 	fclose(PtrFunc);
 }
 
-void Alterar()
+
+void Alterar(void)
 {
 	TpFunc Reg;
 	int pos;
@@ -192,7 +201,82 @@ void Ordenar(void)
 		}		
 		getch();
 }
-
+// EXCLUSAO LOGICA É DESATIVAR UM REGISTRO PARA ELE NÃO SER EXIBIDO
+void ExclusaoLog(void)
+{
+	TpFunc Reg;
+	int pos;
+	FILE *PtrFunc = fopen("func.dat","rb+");
+	printf("\n### Exclusao Logica De Funcionarios ###\n");
+	printf("Digite a Matricula: ");
+	scanf("%d",&Reg.Matricula);
+	while (Reg.Matricula>0)
+	{
+		pos = BuscaFunc(PtrFunc,Reg.Matricula);
+		if (pos==-1)
+			printf("\nFuncionario nao Cadastrado!\n");
+		else
+			{
+				fseek(PtrFunc,pos,0);
+				fread(&Reg,sizeof(TpFunc),1,PtrFunc);
+				printf("\n*** Detalhes do Registro ***\n");
+				printf("Matricula: %d\n",Reg.Matricula);
+				printf("Nome: %s\n",Reg.Nome);
+				printf("Salario: R$ %.2f\n",Reg.Salario);
+				
+				printf("\nConfirma Exclusao (S/N)? ");
+				if(toupper(getche())=='S')
+				{
+					Reg.Status = 'I'; // Inativo
+					fseek(PtrFunc,pos,0);
+					fwrite(&Reg,sizeof(TpFun),1,PtrFunc);
+					printf("\n Registro Deletado Logicamente\n");
+				}
+			}
+		getch();
+		printf("\nDigite a Matricula: ");
+		scanf("%d",&Reg.Matricula);
+	}
+	fclose(PtrFunc);
+}
+void RecuperarLog(void) 
+{
+	TpFunc Reg;
+	int pos;
+	FILE *PtrFunc = fopen("func.dat","rb+");
+	printf("\n### Recuperação Logica De Funcionarios ###\n");
+	printf("Digite a Matricula: ");
+	scanf("%d",&Reg.Matricula);
+	while (Reg.Matricula>0)
+	{
+		pos = BuscaFunc(PtrFunc,Reg.Matricula);
+		if (pos==-1)
+			printf("\nFuncionario nao Cadastrado!\n");
+		else
+			{
+				fseek(PtrFunc,pos,0);
+				fread(&Reg,sizeof(TpFunc),1,PtrFunc);
+				printf("\n*** Detalhes do Registro ***\n");
+				printf("Matricula: %d\n",Reg.Matricula);
+				printf("Nome: %s\n",Reg.Nome);
+				printf("Salario: R$ %.2f\n",Reg.Salario);
+				
+				printf("\nConfirma para Recuperar (S/N)? ");
+				if(toupper(getche())=='S')
+				{
+					Reg.Status = 'A'; // Ativo
+					fseek(PtrFunc,pos,0);
+					fwrite(&Reg,sizeof(TpFun),1,PtrFunc);
+					printf("\n Registro Recuperado Logicamente\n");
+				}
+			}
+		getch();
+		printf("\nDigite a Matricula: ");
+		scanf("%d",&Reg.Matricula);
+	}
+	fclose(PtrFunc);
+}
+}
 void Exclusao (void)
 {
 	TpFunc Reg;
@@ -275,3 +359,5 @@ int main(void)
 	}while (op!=27);
 	return 0;
 }
+
+// TEM QUE FAZER PARA EXCLUIR TODOS QUE ESTÃO INATIVOS
