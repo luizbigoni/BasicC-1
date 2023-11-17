@@ -41,10 +41,10 @@ struct tpFornecedor
 
  struct tpVendas
  {
- 	int CodVenda,CPF;
+ 	int CodVenda;
  	float TotVenda;
  	tpDataV Data;
- 	char status;
+ 	char status,CPF[TF];
  };
  
  struct tpVendasProd
@@ -368,8 +368,8 @@ void RealizarVendas(void) //vendas
 	op = toupper(getche());
 	if(op == 'S')
 	{
-		FILE * PtrVendas=fopen ("Vendas.dat","ab")
-		rewind(PtrVendas)
+		FILE * PtrVendas=fopen ("Vendas.dat","ab+");
+		rewind(PtrVendas);
 		
 		limparTela();
 		
@@ -384,11 +384,11 @@ void RealizarVendas(void) //vendas
 		pos = BuscaCliente(PtrCli,AuxCPF);
 		if(pos!=-1)//achou
 		{
-			FILE * PtrProd=fopen ("Produto.dat","rb");
+			FILE * PtrProd=fopen ("Produto.dat","ab+");
 			while(strlen(AuxCPF)==11)
 			{
 				// ESSE IF TA ERRADO E O DE BAIXO TAMBEM
-				if(TabProd.Cod>0) //esse TLP>0 n pode ta no lugar daquele TLP!=0 dentro do while?
+				if(PtrProd==NULL) //esse TLP>0 n pode ta no lugar daquele TLP!=0 dentro do while?
 				{
 					
 				   gotoxy(32,13);
@@ -398,10 +398,11 @@ void RealizarVendas(void) //vendas
 				   posP=BuscaProduto(PtrProd,AuxCodProd);
 				   if(posP!=-1) //achou
 				   {	
+				   		
 						gotoxy(32,14);
 					   	printf("Quantos deseja comprar: ");
 					   	scanf("%d",&Qtde);
-					   	if(Qtde <= TabProd.Estoque[posP]) // Menor que o estoque
+					   	if(Qtde <= TabProd.Estoque) // Menor que o estoque
 	                        {
 							 	TabVendas.CodVenda = TabVendas.CodVenda + 1;
 				   		        strcpy(TabVendas.CPF,AuxCPF);
@@ -411,13 +412,13 @@ void RealizarVendas(void) //vendas
 					   			TabVendasProd.CodProd = AuxCodProd;
 					   			TabVendasProd.CodVenda = TabVendas.CodVenda;
 					   			TabVendasProd.Qtde = Qtde;
-					   			TabVendasProd.ValorUnitario = TabProd.Preco[posP];
+					   			TabVendasProd.ValorUnitario = TabProd.Preco;
 					   			ValorTotal = TabVendasProd.Qtde * TabVendasProd.ValorUnitario;
 						        
-						        TabProd.Estoque[posP] -= Qtde;
-						        if(TabProd.Estoque[posP] == 0)
+						        TabProd.Estoque -= Qtde;
+						        if(TabProd.Estoque == 0)
        						         //ExclusaoProdutos(TabProd,TLP);
-					   			TabCli.QtdeCompras[posP]++;
+					   			TabCli.QtdeCompras++;
 					   			gotoxy(32,16);
 					   			printf("Deseja Realizar mais compras?");
 					   			scanf("%c",&op);
@@ -443,7 +444,7 @@ void RealizarVendas(void) //vendas
 																   	gotoxy(34,14);
 																   	printf("Quantos deseja comprar: ");
 																   	scanf("%d",&Qtde);
-																   	if(Qtde <= TabProd[posP].Estoque) // Menor que o estoque
+																   	if(Qtde <= TabProd.Estoque) // Menor que o estoque
 												                        {
 															   		        gotoxy(34,15);
 															   		        printf("Digite a data do dia da compra");
@@ -451,13 +452,13 @@ void RealizarVendas(void) //vendas
 																   			TabVendasProd.CodProd = AuxCodProd;
 																   			TabVendasProd.CodVenda = TabVendas.CodVenda;
 																   			TabVendasProd.Qtde = Qtde;
-																   			TabVendasProd.ValorUnitario = TabProd.Preco[posP];
+																   			TabVendasProd.ValorUnitario = TabProd.Preco;
 																   			ValorTotal = TabVendasProd.Qtde * TabVendasProd.ValorUnitario;
 																		        
-																		        TabProd.Estoque[posP] -= Qtde;
-																			        if(TabProd.Estoque[posP] == 0)
+																		        TabProd.Estoque-= Qtde;
+																			        if(TabProd.Estoque == 0)
 													       						         //ExclusaoProdutos(TabProd,TLP);
-																	   			TabCli.QtdeCompras[pos]++;
+																	   			TabCli.QtdeCompras++;
 																   			gotoxy(34,16);
 																   			printf("Deseja Realizar mais compras?");
 																   		
@@ -477,7 +478,7 @@ void RealizarVendas(void) //vendas
 																						   			gotoxy(34,13);
 																						   			printf("CodVenda: %d   Valor da Compra: %.2f",TabVendas.CodVenda,TabVendas.TotVenda);
 																						   			
-																						   			TabCli.ValorTotal[pos] += ValorTotal;
+																						   			TabCli.ValorTotal += ValorTotal;
 																						   			getch();
 																									ValorTotal = 0;
 						  					                                             }
@@ -494,7 +495,7 @@ void RealizarVendas(void) //vendas
 																          gotoxy(34, 13);
 														  				  printf("Quantidade maior que estoque");
 														  				  gotoxy(34,15);
-														  				  printf("Estoque: %d",TabProd.Estoque[posP]);
+														  				  printf("Estoque: %d",TabProd.Estoque);
 														     			  getch();
 															            }
 																   		
@@ -540,7 +541,7 @@ void RealizarVendas(void) //vendas
 											gotoxy(34,13);
 											printf("CodVenda: %d   Valor da Compra: %.2f",TabVendas.CodVenda,TabVendas.TotVenda);
 					   			            
-				   			            	TabCli.ValorTotal[pos] += ValorTotal;
+				   			            	TabCli.ValorTotal += ValorTotal;
 				   			            	gotoxy(34,13);
 											ValorTotal = 0;
 											getch();
@@ -557,7 +558,7 @@ void RealizarVendas(void) //vendas
 					          gotoxy(34, 13);
 			  				  printf("Quantidade maior que estoque");
 			  				  gotoxy(34,15);
-			  				  printf("Estoque: %d",TabProd.Estoque[posP]);
+			  				  printf("Estoque: %d",TabProd.Estoque);
 			     			  getch();
 				            }
 					   		
