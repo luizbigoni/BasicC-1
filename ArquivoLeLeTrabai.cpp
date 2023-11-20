@@ -85,6 +85,15 @@ int BuscaProduto(FILE *Ptr, int cod)
 		return -1;
 }
 
+
+int validacaoData(int dia,int mes,int ano) //validação de data OK
+{
+ if(dia>0 && dia<=30 && mes>0 && mes<=12 && ano<=2023)
+	return 1;
+else
+	return -1; 
+}
+
 int BuscaFornecedor(FILE *Ptr, int cod)
 {
 	tpFornecedor R;
@@ -118,6 +127,37 @@ int BuscaCliente(FILE *Ptr, char cod[TF])
 
 
 
+int verificarCPF(char cpf2[12])
+{
+    int mult, soma, i, resto, cpf[11];
+    
+    for(i=0;i<=11;i++){
+        cpf[i] = cpf2[i] - '0';
+    }
+
+    soma=0;
+    for(i=0, mult=10; i<9 ; i++, mult--)
+        soma = soma + (cpf[i]*mult);
+
+    resto = soma%11;
+
+    if((11-resto) == cpf[9] || ((11-resto) == 10 || 11) == (cpf[9]==0))
+    {
+        soma=0;
+        for(i=0, mult=11; i<10 ; i++, mult--)
+            soma = soma + (cpf[i]*mult);
+
+        resto = soma%11;
+
+        if((11-resto) == cpf[10] || ((11-resto) == 10 || 11) == (cpf[10]==0))
+            return 1; // CPF CORRETO
+        else
+            return 0; //CPF INCORRETO
+    }
+    else
+    	return 0;
+}
+     
 
 
 
@@ -126,13 +166,12 @@ int BuscaCliente(FILE *Ptr, char cod[TF])
 
 
 
-
-void CadastroProduto(void)
+void CadastroProduto(void) //cadastro produto OK
 {
 	tpProduto Prod;
-	int auxCod, x, auxCodF, y, i, j ;
-	FILE *PtrProd = fopen("Produto.dat","ab");
-	
+	int auxCod, x, auxCodF, y, i, j, auxDia, auxMes, auxAno, z;
+	FILE *PtrProd = fopen("Produto.dat","ab+");
+	FILE *PtrForn = fopen("Fornecedor.dat", "rb");
 	gotoxy(39 ,9);
 	printf("## Cadastro de Produtos ##");
 	gotoxy(60,11);
@@ -149,9 +188,9 @@ void CadastroProduto(void)
 			gotoxy(34,13);
 			printf("Codigo fornecedor: ");
 			scanf("%d", &auxCodF);
-			FILE *PtrForn = fopen("Fornecedor.dat", "rb");
-			y=2;
-			//y=BuscaFornecedor(PtrForn,auxCodF);
+			
+			
+			y=BuscaFornecedor(PtrForn,auxCodF);
 			if(y != -1)
 				{
 					Prod.CodForn=auxCodF;	
@@ -168,25 +207,45 @@ void CadastroProduto(void)
 					scanf("%f",&Prod.Preco);
 					gotoxy(34,17);
 					printf("Data de validade: ");
-					scanf("%d/%d/%d", &Prod.Valid.d,&Prod.Valid.m,&Prod.Valid.a );
-					fclose(PtrForn);
+					scanf("%d/%d/%d", &auxDia,&auxMes,&auxAno );
+					z=validacaoData(auxDia, auxMes, auxAno);
+					if(z==1)
+					{
+						Prod.Valid.d=auxDia;
+						Prod.Valid.m=auxMes;
+						Prod.Valid.a=auxAno;
+						fclose(PtrForn);
+						Prod.status='A';
+						fwrite(&Prod,sizeof(tpProduto),1,PtrProd);
+						gotoxy(34,19);
+						printf("Produto cadastrado!");
+						getch();
+					}
+					else
+					{
+						gotoxy(34,19);
+						printf("Data invalida! Produto nao cadastrado.");
+						getch();
+					}
+						
+					
 				}
 			else
 			{
 				gotoxy(34,14);
 				printf("Fornecedor inexistente! ");
+				getch();
 			}
 				
 		}
 		else
 		{
 			gotoxy(34, 12);
-			printf("Codigo ja cadastrado! Digite outro.");
+			printf("Produto ja cadastrado!");
+			getch();
 		}
 			
 			
-		
-		fwrite(&Prod,sizeof(tpProduto),1,PtrProd);
 		//limpar a tela para continuar cadastrando
 		for(i = 10;i<23;i++)
 		{	for(j = 29;j<79;j++)
@@ -202,15 +261,16 @@ void CadastroProduto(void)
 		scanf("%d",&auxCod);
 	}	
 	fclose(PtrProd);
+	fclose(PtrForn);
 	
 	
 }
 
-void CadastroFornecedor(void)
+void CadastroFornecedor(void) //cadastro fornecedor OK
 {
 	tpFornecedor Forn;
 	int auxCod, x, i, j;
-	FILE *PtrForn = fopen("Fornecedor.dat","ab");
+	FILE *PtrForn = fopen("Fornecedor.dat","ab+");
 	
 	gotoxy(40 ,9);
 	printf("## Cadastro de fornecedor ##");
@@ -221,8 +281,8 @@ void CadastroFornecedor(void)
 	scanf("%d",&auxCod);
 	while (auxCod>0)
 	{	
-		x=-1;
-		//x=BuscaFornecedor(PtrForn, auxCod);
+	
+		x=BuscaFornecedor(PtrForn, auxCod);
 		if(x==-1)
 		{
 			Forn.Cod=auxCod;
@@ -234,14 +294,19 @@ void CadastroFornecedor(void)
 			printf("Cidade do fornecedor: ");
 			fflush(stdin);
 			gets(Forn.Cid);	
+			Forn.status='A';
+			fwrite(&Forn,sizeof(tpFornecedor),1,PtrForn);
+			gotoxy(34,16);
+			printf("Fornecedor Cadastrado!");
+			getch();
 		}
 		else
 		{
-			gotoxy(34, 13);
-			printf("Codigo ja cadastrado! Digite outro.");
+			gotoxy(34, 14);
+			printf("Fornecedor ja cadastrado!");
+			getch();
 		}
 		
-		fwrite(&Forn,sizeof(tpFornecedor),1,PtrForn);
 		//limpar a tela para continuar cadastrando
 		for(i = 10;i<23;i++)
 		{	for(j = 29;j<79;j++)
@@ -250,6 +315,8 @@ void CadastroFornecedor(void)
 				printf(" ");
 			}
 		}
+		gotoxy(60,11);
+		printf("Sair '0' ");
 		gotoxy(34, 12);	
 		printf("Codigo: "); 
 		scanf("%d",&auxCod);
@@ -261,89 +328,228 @@ void CadastroFornecedor(void)
 
 
 
-void CadastroCliente(void)
+
+void CadastroCliente() // cadastro Cliente
 {
 	tpCliente Cli;
-	int  x,digito10,digito11,cont,resultado=0,soma,num, i, j;
-	char auxCPF[TF];
-	FILE *PtrCli = fopen("cliente.dat","ab");
+	int pos, i, j, x;
+	char AuxCPF[TF];
+	FILE *PtrCli = fopen("cliente.dat","ab+");
 	
 	gotoxy(40 ,9);
-	printf("## Cadastro de cliente##");
-	gotoxy(34, 12); 
-	printf("\nCPF: "); 
+	printf("## Cadastro de cliente ##");
+	gotoxy(34, 12);
+	printf("CPF do Cliente: ");
 	fflush(stdin);
-	gets(auxCPF);
-	while (strlen(auxCPF)==11)
-	{	
-		soma = 0;
-		// Validação do primeiro
-		for (int cont=0;cont<9;cont++)
-		{
-		    num=Cli.CPF[cont]-48;
-		    soma=soma+(num*(10-cont));
-		}
-		resultado=11-(soma%11);
-		if((resultado==10) || (resultado==11))
-		    digito10='0';
-		else
-		    digito10=resultado+48;
+	scanf("%s", &AuxCPF);
+	while(strlen(AuxCPF) == 11)
+	{
 		
-		//Valição do segundo
-		soma=0;
-		for(cont=0; cont<10;cont++)
+		x=verificarCPF(AuxCPF);
+		if(x==1)
 		{
-		    num=Cli.CPF[cont]-48;
-		    soma=soma+(num*(11-cont));
+			pos = BuscaCliente(PtrCli, AuxCPF);
+			if(pos==-1)
+			{
+				strcpy(Cli.CPF,AuxCPF);
+				gotoxy(34, 13);
+				printf("Nome do Cliente: ");
+				fflush(stdin);
+				gets(Cli.Nome);
+				Cli.status='A';
+				fwrite(&Cli,sizeof(tpCliente),1,PtrCli);
+				gotoxy(34,15);
+				printf("Cliente cadastrado!");
+				//limpar a tela para continuar cadastrando
+				for(i = 10;i<23;i++)
+				{	for(j = 29;j<79;j++)
+					{
+						gotoxy(j,i);
+						printf(" ");
+					}
+				}
+			}
+			else
+			{
+				gotoxy(34, 13);
+				printf("Cliente ja cadastrado! digite outro.");
+				getch();
+				//limpar a tela para continuar cadastrando
+				for(i = 10;i<23;i++)
+				{	for(j = 29;j<79;j++)
+					{
+						gotoxy(j,i);
+						printf(" ");
+					}
+				}
+			}
+			
+			gotoxy(34, 12);
+			printf("CPF do Cliente: ");
+			scanf("%d",&AuxCPF);
 		}
-		resultado=11-(soma%11);
-		if((resultado==10) || (resultado==11))
-		    digito11='0';
 		else
-		    digito11=resultado+48;
+		{
+			gotoxy(34,14);
+			printf("CPF invalido!");
+			getch();
+			
+		}
 		
-		if((digito11==Cli.CPF[9])&& (digito11==Cli.CPF[10]))
-		    {
-		    	gotoxy(34, 13);
-		    	printf("CPF valido!");
-				x=BuscaCliente(PtrCli, auxCPF);
-				if(x==-1)
+	}
+	
+}
+
+void ExcluirFisFornecedor(void)
+{
+	FILE *PtrForn = fopen("Fornecedor.dat","rb");
+	int pos, Cod;
+	tpFornecedor Reg;
+	tpProduto RegP;
+	gotoxy(40,9);
+	printf("### EXCLUSAO FISICA DE FORNECEDOR ###"); 
+	if (PtrForn == NULL) //O Arquivo não existe!
+	{
+		gotoxy(40,12);
+		printf("Erro de abertura!");
+	}
+	else
+		{
+			gotoxy(34,12);
+			printf("FORNECEDOR a excluir: ");
+			scanf("%d",&Cod);
+			if (Cod>0)
+			{
+				pos = BuscaFornecedor(PtrForn,Cod);
+				if (pos==-1)
 				{
-					strcpy(Cli.CPF,auxCPF);
-					gotoxy(34, 15);
-					printf("Nome do cliente: "); 
-					fflush(stdin);
-					gets(Cli.Nome);	
+					gotoxy(34,14);
+					printf("Fornecedor nao encontrado!");
+					getch();
+					fclose(PtrForn);
 				}
 				else
-				{
-					gotoxy(34, 15);
-					printf("CPF ja cadastrado! Digite outro.");	
-				}
-					
-		    }
-		    else
-		    {
-		    	gotoxy(34, 13);
-		    	printf("CPF invalido! digite outo.");
-		    }
-		    	
-
-
-		fwrite(&Cli,sizeof(tpCliente),1,PtrCli);
-		//limpar a tela para continuar cadastrando
-		for(i = 10;i<23;i++)
-		{	for(j = 29;j<79;j++)
-			{
-				gotoxy(j,i);
-				printf(" ");
+					{
+						gotoxy(40,13);
+						printf("*** Detalhes do Registro ***");
+						//fseek(Ptr,deslocamento Bytes,a partir de);
+						fseek(PtrForn,pos,0);
+						fread(&Reg,sizeof(tpFornecedor),1,PtrForn);
+						gotoxy(34,15);
+						printf("CodForn: %d",Reg.Cod);	
+						gotoxy(34,16);
+						printf("Cid: %s",Reg.Cid);
+						gotoxy(34,17);
+						printf("Nome: %s",Reg.Nome);	
+						gotoxy(40,19);
+						printf("Confirma Exclusao (S/N)? ");
+						if (toupper(getche())=='S')
+						{
+							FILE *PtrProd = fopen("Produto.dat","wb");
+							FILE *PtrTemp = fopen("Temp.dat","wb");
+							rewind(PtrForn); //fseek(PtrFunc,0,0);
+							fread(&Reg,sizeof(tpFornecedor),1,PtrForn);
+							while (!feof(PtrForn))
+							{
+								if(Cod != Reg.Cod)
+									fwrite(&Reg,sizeof(tpFornecedor),1,PtrTemp);
+									
+								fread(&Reg,sizeof(tpFornecedor),1,PtrForn);
+							}
+							fclose(PtrForn);
+							fclose(PtrTemp);
+							remove("Fornecedor.dat");
+							rename("Temp.dat","Fornecedor.dat");
+					//   ARRUMAR , ESTA EM LOOP INFINITO NO TEMPO.DAT
+						//	printf("PAROU");
+						//	getch();
+							
+							FILE *PtrTempo = fopen("Tempo.dat","wb");
+							
+							rewind(PtrProd); //fseek(PtrFunc,0,0);
+							fread(&RegP,sizeof(tpProduto),1,PtrProd);
+							while (!feof(PtrProd))
+							{
+								if(Cod != RegP.CodForn)
+									fwrite(&RegP,sizeof(tpProduto),1,PtrTempo);
+									
+								fread(&RegP,sizeof(tpProduto),1,PtrProd);
+							}
+							
+							fclose(PtrProd);
+							fclose(PtrTempo);
+							remove("Produto.dat");
+							rename("Tempo.dat","Produto.dat");
+							limparTela();
+							gotoxy(40,14);
+							printf("Registro Excluido!");
+							getch();	
+						}
+						else fclose(PtrForn);
+					}
 			}
 		}
-		gotoxy(34, 12);	
-		printf("CPF: "); 
-		scanf("%d",&auxCPF);
-	}	
-	fclose(PtrCli);
+}
+
+         void ExcluirFisProduto(void)
+{
+	FILE *PtrProd = fopen("Produto.dat","rb");
+	int pos, Cod;
+	tpProduto Reg;
+	printf("### EXCLUSAO FISICA DE PRODUTO ###"); 
+	if (PtrProd == NULL) //O Arquivo não existe!
+		printf("\nErro de abertura!\n");
+	else
+		{
+			printf("PRODUTOr a excluir: ");
+			scanf("%d",&Cod);
+			if (Cod>0)
+			{
+				pos = BuscaFornecedor(PtrProd,Cod);
+				if (pos==-1)
+				{
+					printf("Produto nao encontrada!");
+					fclose(PtrProd);
+				}
+				else
+					{
+						printf("*** Detalhes do Registro ***");
+						//fseek(Ptr,deslocamento Bytes,a partir de);
+						fseek(PtrProd,pos,0);
+						fread(&Reg,sizeof(tpProduto),1,PtrProd);
+						printf("Cod: %d",Reg.Cod);
+						printf("Nome: %s",Reg.Descr);
+						printf("Preco: R$ %.2f",Reg.Preco);
+						printf("Estoque: %d",Reg.Estoque);
+						printf("Validade; %d/%d/%d",Reg.Valid.d,Reg.Valid.m,Reg.Valid.a);
+						printf("CodForn: %d",Reg.CodForn);	
+						
+						printf("Confirma Exclusao (S/N)? ");
+						if (toupper(getche())=='S')
+						{
+							FILE *PtrTemp = fopen("Temp.dat","wb");
+							rewind(PtrProd); //fseek(PtrFunc,0,0);
+							fread(&Reg,sizeof(tpProduto),1,PtrProd);
+							while (!feof(PtrProd))
+							{
+								if(Cod != Reg.Cod)
+									fwrite(&Reg,sizeof(tpProduto),1,PtrTemp);
+									
+								fread(&Reg,sizeof(tpProduto),1,PtrProd);
+							}
+							fclose(PtrProd);
+							fclose(PtrTemp);
+							remove("Produto.dat");
+							rename("Temp.dat","Produto.dat");
+							
+							
+							printf("Registro Excluido!");
+							getch();	
+						}
+						else fclose(PtrProd);
+					}
+			}
+		}
 }
 
 void RealizarVendas(void) //vendas
@@ -400,7 +606,7 @@ void RealizarVendas(void) //vendas
 				   {	
 				   		
 						gotoxy(32,14);
-					   	printf("Quantos deseja comprar: ");
+					   	printf("Quantos deseja comprar: ");   
 					   	scanf("%d",&Qtde);
 					   	if(Qtde <= TabProd.Estoque) // Menor que o estoque
 	                        {
@@ -1008,11 +1214,11 @@ int main(void)
 										switch(opEscolha)
 										{
 											case 'A':	limparTela();
-														//Produtos
+														ExcluirFisProduto();//Produtos
 														break;
 														
 											case 'B':	limparTela();
-														//fornecedoR
+														ExcluirFisFornecedor();//fornecedoR
 														break;
 														
 											case 'C':	limparTela();
