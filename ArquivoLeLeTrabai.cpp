@@ -447,7 +447,7 @@ void ExcluirFisFornecedor(void)
 						printf("Confirma Exclusao (S/N)? ");
 						if (toupper(getche())=='S')
 						{
-							FILE *PtrProd = fopen("Produto.dat","wb");
+							FILE *PtrProd = fopen("Produto.dat","rb");
 							FILE *PtrTemp = fopen("Temp.dat","wb");
 							rewind(PtrForn); //fseek(PtrFunc,0,0);
 							fread(&Reg,sizeof(tpFornecedor),1,PtrForn);
@@ -646,7 +646,7 @@ void RealizarVendas(int &cont) //vendas
 				   posP=BuscaProduto(PtrProd,AuxCodProd);
 				   if(posP!=-1) //achou
 				   {	
-				   		//fseek(PtrProd,sizeof(tpProduto),0,posP);
+				   		fseek(PtrProd,posP,0);
 				   
 				   		
 				   		
