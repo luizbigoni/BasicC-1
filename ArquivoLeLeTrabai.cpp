@@ -35,7 +35,7 @@ struct tpFornecedor
  {
  	int QtdeCompras;
  	float ValorTotal;
- 	char Nome[TF],status, CPF[TF];;
+ 	char Nome[TF],status, CPF[TF];
  };
  
 
@@ -44,7 +44,7 @@ struct tpFornecedor
  	int CodVenda;
  	float TotVenda;
  	tpDataV Data;
- 	char status,CPF[TF];
+ 	char status, CPF[TF];
  };
  
  struct tpVendasProd
@@ -55,7 +55,7 @@ struct tpFornecedor
  };
  
  
-void limparTela(void) //função de limpar tela
+void limparTela(void) //função de limpar telka OK
 {
 	
 	int i , j;
@@ -69,14 +69,14 @@ void limparTela(void) //função de limpar tela
 	}
 }
 
-int BuscaProduto(FILE * Ptr, int cod)
+int BuscaProduto(FILE *Ptr, int cod) //busca produto OK
 {
 	tpProduto R;
 	rewind(Ptr);  
 	
 	fread(&R,sizeof(tpProduto),1,Ptr);
-	//while (!feof(Ptr) &&  (cod!=R.Cod || R.status!='A'))
-	while (!feof(Ptr) &&  !(cod==R.Cod && R.status=='A'))
+	while (!feof(Ptr) &&  (cod!=R.Cod || R.status!='A'))
+	//while (!feof(Ptr) &&  !(cod==R.Cod && R.status=='A'))
 		fread(&R,sizeof(tpProduto),1,Ptr);
 		
 	if (!feof(Ptr))
@@ -85,16 +85,7 @@ int BuscaProduto(FILE * Ptr, int cod)
 		return -1;
 }
 
-
-int validacaoData(int dia,int mes,int ano) //validação de data OK
-{
- if(dia>0 && dia<=30 && mes>0 && mes<=12 && ano<=2023)
-	return 1;
-else
-	return -1; 
-}
-
-int BuscaFornecedor(FILE * Ptr, int cod)
+int BuscaFornecedor(FILE *Ptr, int cod) //busca fornecedor OK
 {
 	tpFornecedor R;
 	rewind(Ptr);  
@@ -110,13 +101,14 @@ int BuscaFornecedor(FILE * Ptr, int cod)
 		return -1;
 }
 
-int BuscaCliente(FILE *Ptr, char cod[TF])
+int BuscaCli(FILE *Ptr, char cod[]) //busca cliente OK
 {
 	tpCliente R;
 	rewind(Ptr);  
 	
+	fseek(Ptr,0,0);
 	fread(&R,sizeof(tpCliente),1,Ptr);
-	while (!feof(Ptr) &&  (strcmp(cod,R.CPF)!=0 || R.status!='A'))
+	while(!feof(Ptr) && (strcmp(cod,R.CPF)!=0 || R.status!='A'))
 		fread(&R,sizeof(tpCliente),1,Ptr);
 		
 	if (!feof(Ptr))
@@ -127,44 +119,13 @@ int BuscaCliente(FILE *Ptr, char cod[TF])
 
 
 
-int verificarCPF(char cpf2[12])
+int validacaoData(int dia,int mes,int ano) //validação de data OK
 {
-    int mult, soma, i, resto, cpf[11];
-    
-    for(i=0;i<=11;i++){
-        cpf[i] = cpf2[i] - '0';
-    }
-
-    soma=0;
-    for(i=0, mult=10; i<9 ; i++, mult--)
-        soma = soma + (cpf[i]*mult);
-
-    resto = soma%11;
-
-    if((11-resto) == cpf[9] || ((11-resto) == 10 || 11) == (cpf[9]==0))
-    {
-        soma=0;
-        for(i=0, mult=11; i<10 ; i++, mult--)
-            soma = soma + (cpf[i]*mult);
-
-        resto = soma%11;
-
-        if((11-resto) == cpf[10] || ((11-resto) == 10 || 11) == (cpf[10]==0))
-            return 1; // CPF CORRETO
-        else
-            return 0; //CPF INCORRETO
-    }
-    else
-    	return 0;
+ if(dia>0 && dia<=30 && mes>0 && mes<=12 && ano<=2023)
+	return 1;
+else
+	return -1; 
 }
-     
-
-
-
-
-
-
-
 
 void CadastroProduto(void) //cadastro produto OK
 {
@@ -181,7 +142,7 @@ void CadastroProduto(void) //cadastro produto OK
 	scanf("%d",&auxCod);
 	while (auxCod>0)
 	{	
-		//x = -1; 
+		 
 		x=BuscaProduto(PtrProd, auxCod);
 		if(x == -1)
 		{
@@ -191,6 +152,7 @@ void CadastroProduto(void) //cadastro produto OK
 			
 			
 			y=BuscaFornecedor(PtrForn,auxCodF);
+			//printf("%d", y);
 			if(y != -1)
 				{
 					Prod.CodForn=auxCodF;	
@@ -214,7 +176,6 @@ void CadastroProduto(void) //cadastro produto OK
 						Prod.Valid.d=auxDia;
 						Prod.Valid.m=auxMes;
 						Prod.Valid.a=auxAno;
-						fclose(PtrForn);
 						Prod.status='A';
 						fwrite(&Prod,sizeof(tpProduto),1,PtrProd);
 						gotoxy(34,19);
@@ -325,11 +286,36 @@ void CadastroFornecedor(void) //cadastro fornecedor OK
 	fclose(PtrForn);
 }
 
+int ValidarCPF(char cpf2[11]) //validação de cpf 
+{
+    int mult, soma, i, resto;
+	char cpf[11];
+	
+    for(i=0;i<=11;i++)
+	{
+        cpf[i] = cpf2[i] - '0';
+    }
+    soma=0;
+    for(i=0, mult=10; i<9 ; i++, mult--)
+        soma = soma + (cpf[i]*mult);
+    resto = soma%11;
+    if((11-resto) == cpf[9] || ((11-resto) == 10 || 11) == (cpf[9]==0))
+    {
+        soma=0;
+        for(i=0, mult=11; i<10 ; i++, mult--)
+            soma = soma + (cpf[i]*mult);
+        resto = soma%11;
+        if((11-resto) == cpf[10] || ((11-resto) == 10 || 11) == (cpf[10]==0))
+            return 1; // CPF CORRETO
+        else
+            return 0; //CPF INCORRETO
+    }
+    else
+        return 0; //CPF INCORRETO
+}
 
-
-
-
-void CadastroCliente() // cadastro Cliente
+	
+void CadastroCliente() //cadastro Cliente OK
 {
 	tpCliente Cli;
 	int pos, i, j, x;
@@ -338,17 +324,19 @@ void CadastroCliente() // cadastro Cliente
 	
 	gotoxy(40 ,9);
 	printf("## Cadastro de cliente ##");
+	gotoxy(60,11);
+	printf("Sair '0' ");
 	gotoxy(34, 12);
 	printf("CPF do Cliente: ");
 	fflush(stdin);
 	scanf("%s", &AuxCPF);
 	while(strlen(AuxCPF) == 11)
 	{
-		
-		x=verificarCPF(AuxCPF);
+		//x=1;
+		x=ValidarCPF(AuxCPF);
 		if(x==1)
 		{
-			pos = BuscaCliente(PtrCli, AuxCPF);
+			pos = BuscaCli(PtrCli, AuxCPF);
 			if(pos==-1)
 			{
 				strcpy(Cli.CPF,AuxCPF);
@@ -356,10 +344,13 @@ void CadastroCliente() // cadastro Cliente
 				printf("Nome do Cliente: ");
 				fflush(stdin);
 				gets(Cli.Nome);
+				Cli.QtdeCompras=0;
+				Cli.ValorTotal=0;
 				Cli.status='A';
 				fwrite(&Cli,sizeof(tpCliente),1,PtrCli);
 				gotoxy(34,15);
 				printf("Cliente cadastrado!");
+				getch();
 				//limpar a tela para continuar cadastrando
 				for(i = 10;i<23;i++)
 				{	for(j = 29;j<79;j++)
@@ -384,606 +375,31 @@ void CadastroCliente() // cadastro Cliente
 				}
 			}
 			
-			gotoxy(34, 12);
-			printf("CPF do Cliente: ");
-			scanf("%d",&AuxCPF);
+
 		}
 		else
 		{
 			gotoxy(34,14);
 			printf("CPF invalido!");
 			getch();
-			
-		}
-		
-	}
-	
-}
-
-void ExcluirFisCliente(void)
-{
-	FILE *PtrCli = fopen("cliente.dat","rb");
-	int pos;
-	char AuxCPF;
-	tpCliente Reg;
-	tpVendas RegV;
-	tpVendasProduto RegVP;
-	gotoxy(40,9);
-	printf("### EXCLUSAO FISICA DE CLIENTE ###"); 
-	if (PtrCli == NULL) //O Arquivo não existe!
-	{
-		gotoxy(40,12);
-		printf("Erro de abertura!");
-	}
-	else
-		{
-			gotoxy(34,12);
-			printf("CLIENTE a excluir: ");
-			fflush(stdin); gets(AuxCPF);
-			if (strlen(AuxCPF)==11)
-			{
-				pos = BuscaCliente(PtrCli,AuxCPF);
-				if (pos==-1)
-				{
-					gotoxy(34,14);
-					printf("CLIENTE nao encontrado!");
-					getch();
-					fclose(PtrCli);
-				}
-				else
-					{
-						gotoxy(40,13);
-						printf("*** Detalhes do Registro ***");
-						//fseek(Ptr,deslocamento Bytes,a partir de);
-						fseek(PtrCli,pos,0);
-						fread(&Reg,sizeof(tpCliente),1,PtrCli);
-						gotoxy(34,15);
-						printf("CPF: %d",Reg.CPF);	
-						gotoxy(34,16);
-						printf("Nome: %s",Reg.Nome);
-						gotoxy(34,17);
-						printf("QtdCompras: %d",Reg.QtdeCompras);
-						gotoxy(34,18);
-						printf("ValorTotal: %.2f",Reg.ValorTotal);	
-						gotoxy(40,20);
-						printf("Confirma Exclusao (S/N)? ");
-						if (toupper(getche())=='S')
-						{
-							FILE *PtrVendas = fopen("vendas.dat","rb");
-							FILE *PtrTemp = fopen("Temp.dat","wb");
-							rewind(PtrCli); //fseek(PtrFunc,0,0);
-							fread(&Reg,sizeof(tpCliente),1,PtrCli);
-							while (!feof(PtrCli))
-							{
-								if(stricmp(AuxCPF,Reg.CPF)!= 0)
-									fwrite(&Reg,sizeof(tpCliente),1,PtrTemp);
-									
-								fread(&Reg,sizeof(tpCliente),1,PtrCli);
-							}
-							fclose(PtrCli);
-							fclose(PtrTemp);
-							remove("Cliente.dat");
-							rename("Temp.dat","Cliente.dat");
-					
-							
-							FILE *PtrTempo = fopen("Tempo.dat","wb");
-							
-							rewind(PtrProd); //fseek(PtrFunc,0,0);
-							fread(&RegP,sizeof(tpProduto),1,PtrProd);
-							while (!feof(PtrProd))
-							{
-								if(Cod != RegP.CodForn)
-									fwrite(&RegP,sizeof(tpProduto),1,PtrTempo);
-									
-								fread(&RegP,sizeof(tpProduto),1,PtrProd);
-							}
-							
-							fclose(PtrProd);
-							fclose(PtrTempo);
-							remove("Produto.dat");
-							rename("Tempo.dat","Produto.dat");
-							limparTela();
-							gotoxy(40,14);
-							printf("Registro Excluido!");
-							getch();	
-						}
-						else fclose(PtrForn);
-					}
-			}
-		}
-}
-
-void ExcluirFisFornecedor(void)
-{
-	FILE *PtrForn = fopen("Fornecedor.dat","rb");
-	int pos, Cod;
-	tpFornecedor Reg;
-	tpProduto RegP;
-	gotoxy(40,9);
-	printf("### EXCLUSAO FISICA DE FORNECEDOR ###"); 
-	if (PtrForn == NULL) //O Arquivo não existe!
-	{
-		gotoxy(40,12);
-		printf("Erro de abertura!");
-	}
-	else
-		{
-			gotoxy(34,12);
-			printf("FORNECEDOR a excluir: ");
-			scanf("%d",&Cod);
-			if (Cod>0)
-			{
-				pos = BuscaFornecedor(PtrForn,Cod);
-				if (pos==-1)
-				{
-					gotoxy(34,14);
-					printf("Fornecedor nao encontrado!");
-					getch();
-					fclose(PtrForn);
-				}
-				else
-					{
-						gotoxy(40,13);
-						printf("*** Detalhes do Registro ***");
-						//fseek(Ptr,deslocamento Bytes,a partir de);
-						fseek(PtrForn,pos,0);
-						fread(&Reg,sizeof(tpFornecedor),1,PtrForn);
-						gotoxy(34,15);
-						printf("CodForn: %d",Reg.Cod);	
-						gotoxy(34,16);
-						printf("Cid: %s",Reg.Cid);
-						gotoxy(34,17);
-						printf("Nome: %s",Reg.Nome);	
-						gotoxy(40,19);
-						printf("Confirma Exclusao (S/N)? ");
-						if (toupper(getche())=='S')
-						{
-							FILE *PtrProd = fopen("Produto.dat","rb");
-							FILE *PtrTemp = fopen("Temp.dat","wb");
-							rewind(PtrForn); //fseek(PtrFunc,0,0);
-							fread(&Reg,sizeof(tpFornecedor),1,PtrForn);
-							while (!feof(PtrForn))
-							{
-								if(Cod != Reg.Cod)
-									fwrite(&Reg,sizeof(tpFornecedor),1,PtrTemp);
-									
-								fread(&Reg,sizeof(tpFornecedor),1,PtrForn);
-							}
-							fclose(PtrForn);
-							fclose(PtrTemp);
-							remove("Fornecedor.dat");
-							rename("Temp.dat","Fornecedor.dat");
-					//   ARRUMAR , ESTA EM LOOP INFINITO NO TEMPO.DAT
-						//	printf("PAROU");
-						//	getch();
-							
-							FILE *PtrTempo = fopen("Tempo.dat","wb");
-							
-							rewind(PtrProd); //fseek(PtrFunc,0,0);
-							fread(&RegP,sizeof(tpProduto),1,PtrProd);
-							while (!feof(PtrProd))
-							{
-								if(Cod != RegP.CodForn)
-									fwrite(&RegP,sizeof(tpProduto),1,PtrTempo);
-									
-								fread(&RegP,sizeof(tpProduto),1,PtrProd);
-							}
-							
-							fclose(PtrProd);
-							fclose(PtrTempo);
-							remove("Produto.dat");
-							rename("Tempo.dat","Produto.dat");
-							limparTela();
-							gotoxy(40,14);
-							printf("Registro Excluido!");
-							getch();	
-						}
-						else fclose(PtrForn);
-					}
-			}
-		}
-}
-
-void ExcluirFisProduto(void)
-{
-	FILE *PtrProd = fopen("Produto.dat","rb");
-	int pos, Cod;
-	tpProduto Reg;
-	gotoxy(40,9);
-	printf("### EXCLUSAO FISICA DE PRODUTO ###"); 
-	if (PtrProd == NULL) //O Arquivo não existe!
-	{
-		gotoxy(34,12);
-		printf("Erro de abertura!");
-	}
-				
-	else
-		{
-			gotoxy(34,12);
-			printf("PRODUTOr a excluir: ");
-			scanf("%d",&Cod);
-			if (Cod>0)
-			{
-				pos = BuscaProduto(PtrProd,Cod);
-				if (pos==-1)
-				{	gotoxy(34,14);
-					printf("Produto nao encontrada!");
-					getch();
-					fclose(PtrProd);
-				}
-				else
-					{
-						gotoxy(34,14);
-						printf("*** Detalhes do Registro ***");
-						//fseek(Ptr,deslocamento Bytes,a partir de);
-						fseek(PtrProd,pos,0);
-						fread(&Reg,sizeof(tpProduto),1,PtrProd);
-						gotoxy(34,15);
-						printf("Cod: %d",Reg.Cod);
-						gotoxy(34,16);
-						printf("Nome: %s",Reg.Descr);
-						gotoxy(34,17);
-						printf("Preco: R$ %.2f",Reg.Preco);
-						gotoxy(34,18);
-						printf("Estoque: %d",Reg.Estoque);
-						gotoxy(34,19);
-						printf("Validade; %d/%d/%d",Reg.Valid.d,Reg.Valid.m,Reg.Valid.a);
-						gotoxy(34,20);
-						printf("CodForn: %d",Reg.CodForn);	
-						
-						gotoxy(40,22);
-						printf("Confirma Exclusao (S/N)? ");
-						if (toupper(getche())=='S')
-						{
-							FILE *PtrTemp = fopen("Temp.dat","wb");
-							rewind(PtrProd); //fseek(PtrFunc,0,0);
-							fread(&Reg,sizeof(tpProduto),1,PtrProd);
-							while (!feof(PtrProd))
-							{
-								if(Cod != Reg.Cod)
-									fwrite(&Reg,sizeof(tpProduto),1,PtrTemp);
-									
-								fread(&Reg,sizeof(tpProduto),1,PtrProd);
-							}
-							fclose(PtrProd);
-							fclose(PtrTemp);
-							remove("Produto.dat");
-							rename("Temp.dat","Produto.dat");
-							
-							limparTela();
-							gotoxy(40,16);
-							printf("Registro Excluido!");
-							getch();	
-						}
-						else fclose(PtrProd);
-					}
-			}
-		}
-}
-
-void ExcluirProdutoEstoque(void)
-{
-	tpProduto Reg;
-	FILE *PtrProd = fopen("Produto.dat","rb+");
-	FILE *PtrTemp = fopen("Temp.dat","wb");
-	rewind(PtrProd); //fseek(PtrFunc,0,0);
-	fread(&Reg,sizeof(tpProduto),1,PtrProd);
-	while (!feof(PtrProd))
-	{
-		if(0 != Reg.Estoque)
-			fwrite(&Reg,sizeof(tpProduto),1,PtrTemp);
-			
-		fread(&Reg,sizeof(tpProduto),1,PtrProd);
-	}
-	fclose(PtrProd);
-	fclose(PtrTemp);
-	remove("Produto.dat");
-	rename("Temp.dat","Produto.dat");
-	getch();	
-					
-}
-
-void RealizarVendas(int &cont) //vendas
-{
- 	 tpVendas TabVendas;
- 	 tpVendasProd TabVendasProd;
- 	 tpProduto TabProd;
- 	 tpCliente TabCli;
-	 
-	 int i=0, x=12,j, AuxCodProd,pos,posP,Qtde,CodVenda,CodProd,ValorTotal = 0;
-		char AuxCPF[TF],op,OP;;
-	
-
-	
-
-	
-	gotoxy(43,9);
-	printf("## Realizar Venda ##");
-	
-	gotoxy(38 ,12);
-	printf("Deseja Efetuar uma compra? S/N: ");
-	//toupper(getch(op));
-	//scanf("%c",&op);
-	op = toupper(getche());
-	if(op == 'S')
-	{
-		
-		
-		
-		limparTela();
-		
-		
-		gotoxy(43,9);
-		printf("## Realizar Venda ##");
-		gotoxy(32, 12);
-		printf("Digite o seu CPF: ");
-		gets(AuxCPF);
-		FILE * PtrCli = fopen ("cliente.dat","rb+");
-		FILE *PtrVendasProd = fopen ("VendProdutos.dat","ab+");
-		FILE * PtrVendas=fopen ("Vendas.dat","ab+");
-		FILE * PtrProd=fopen ("Produto.dat","rb+");
-		pos = BuscaCliente(PtrCli,AuxCPF);
-		
-			while(pos != -1)//achou
-			{
-				
-				if(PtrProd!=NULL) //PtrProd == NULL significa que nao tem nd dentro do arquivo
-				{
-					
-				   gotoxy(34,13);
-				   printf("Qual produto deseja comprar(CodProd): ");
-				   scanf("%d",& AuxCodProd);
-				  
-				   posP=BuscaProduto(PtrProd,AuxCodProd);
-				   if(posP!=-1) //achou
-				   {	
-				   		fseek(PtrProd,posP,0);
-				   
-				   		
-				   		
-						gotoxy(34,14);
-					   	printf("Quantos deseja comprar: ");
-					   	scanf("%d",&Qtde);
-					   	if(Qtde <= TabProd.Estoque) // Menor que o estoque
-	                        {
-	                        	cont++;
-							 	TabVendas.CodVenda = cont;
-				   		        strcpy(TabVendas.CPF,AuxCPF);
-				   		        gotoxy(32,15);
-				   		        printf("Digite a data do dia da compra:");
-				   		        scanf("%d %d %d",&TabVendas.Data.d,&TabVendas.Data.m,&TabVendas.Data.a);
-					   			TabVendasProd.CodProd = AuxCodProd;
-					   			TabVendasProd.CodVenda = TabVendas.CodVenda;
-					   			TabVendasProd.Qtde = Qtde;
-					   			TabVendasProd.ValorUnitario = TabProd.Preco;
-					   			ValorTotal = TabVendasProd.Qtde * TabVendasProd.ValorUnitario;
-					   			
-						        fwrite(&TabVendas,sizeof(tpVendas),1,PtrVendas);
-						       
-						       fwrite(&TabVendasProd,sizeof(tpVendasProd),1,PtrVendasProd);
-						       
-							    TabProd.Estoque -= Qtde;
-						        if(TabProd.Estoque == 0)
-       						         ExcluirProdutoEstoque();
-					   			TabCli.QtdeCompras++;
-					   			fwrite(&TabProd,sizeof(tpProduto),1,PtrProd);
-					   			gotoxy(34,16);
-					   			printf("Deseja Realizar mais compras?");
-					   			scanf("%c",&op);
-					   			op = toupper(getche());;
-					   			if(op=='S')
-					   			  {
-					   			   		   while(op == 'S')
-								   			{
-									   				for(i = 10;i<23;i++)
-														for(j = 29;j<79;j++)
-															{
-																gotoxy(j,i);
-																printf(" ");
-															}
-												  	if(TabProd.Cod!=NULL)
-														{
-														   gotoxy(34,13);
-														   printf("Qual produto deseja comprar(CodProd): ");
-														   scanf("%d",&AuxCodProd);
-														   posP=BuscaProduto(PtrProd,AuxCodProd);
-															   if(posP!=-1) //achou
-															   {
-																   	gotoxy(34,14);
-																   	printf("Quantos deseja comprar: ");
-																   	scanf("%d",&Qtde);
-																   	if(Qtde <= TabProd.Estoque) // Menor que o estoque
-												                        {
-												                        	
-															   		        gotoxy(34,15);
-															   		        printf("Digite a data do dia da compra");
-															   		        scanf("%d %d %d",&TabVendas.Data.d,&TabVendas.Data.m,&TabVendas.Data.a);
-																   			TabVendasProd.CodProd = AuxCodProd;
-																   			TabVendasProd.CodVenda = cont;
-																   			TabVendasProd.Qtde = Qtde;
-																   			TabVendasProd.ValorUnitario = TabProd.Preco;
-																   			ValorTotal = TabVendasProd.Qtde * TabVendasProd.ValorUnitario;
-																   			
-																   			fwrite(&TabVendas,sizeof(tpVendas),1,PtrVendas);
-																   			fwrite(&TabVendasProd,sizeof(tpVendasProd),1,PtrVendasProd);
-																		        
-																		        TabProd.Estoque-= Qtde;
-																			        if(TabProd.Estoque == 0)
-													       						         ExcluirProdutoEstoque();
-																	   			TabCli.QtdeCompras++;
-																   			gotoxy(34,16);
-																   			printf("Deseja Realizar mais compras?");
-																   			fwrite(&TabProd,sizeof(tpProduto),1,PtrProd);
-																   			op = toupper(getche());
-																   			if(op == 'N')
-																   				  {
-																   				  	   	 
-														   			            		for(i = 10;i<23;i++)
-																							for(j = 29;j<79;j++)
-																								{
-																									gotoxy(j,i);
-																									printf(" ");
-																								}
-																						gotoxy(34,12);
-																						printf("Compra efetuada com sucesso!");
-																			   			TabVendas.TotVenda = ValorTotal;
-																			   			gotoxy(34,13);
-																			   			printf("CodVenda: %d   Valor da Compra: %.2f",TabVendas.CodVenda,TabVendas.TotVenda);
-																			   			 
-																			   			TabCli.ValorTotal += ValorTotal;
-																			   			fwrite(&TabCli,sizeof(tpCliente),1,PtrCli);
-																			   			getch();
-																						ValorTotal = 0;
-						  					                                             
-																   				  }
-																   		}
-																   		else
-															            {
-																		   	for(i = 10;i<23;i++)
-																				for(j = 29;j<79;j++)
-																				{
-																					gotoxy(j,i);
-																					printf(" ");
-																				}
-																          gotoxy(34, 13);
-														  				  printf("Quantidade maior que estoque");
-														  				  gotoxy(34,15);
-														  				  printf("Estoque: %d",TabProd.Estoque);
-														     			  getch();
-															            }
-																   		
-															   }
-															   else
-															   {
-																   	for(i = 10;i<23;i++)
-																		for(j = 29;j<79;j++)
-																		{
-																			gotoxy(j,i);
-																			printf(" ");
-																		}
-														          gotoxy(34, 13);
-												  				  printf("Produto não encontrado!");
-												     			  getch();
-															   } 
-													   }
-													   else
-														  {
-															   	for(i = 10;i<23;i++)
-																	for(j = 29;j<79;j++)
-																	{
-																		gotoxy(j,i);
-																		printf(" ");
-																	}
-								                              gotoxy(34, 13);
-												  			  printf("Sem Produtos para vender!");
-												     		  getch();
-														  }
-											  }						
-			   			            }
-			   			            else
-			   			            {
-			   			            		for(i = 10;i<23;i++)
-												for(j = 29;j<79;j++)
-													{
-														gotoxy(j,i);
-														printf(" ");
-													}
-											gotoxy(34,12);
-											printf("Compra efetuada com sucesso!");
-											TabVendas.TotVenda = ValorTotal;
-											gotoxy(34,13);
-											printf("CodVenda: %d   Valor da Compra: %.2f",TabVendas.CodVenda,TabVendas.TotVenda);
-					   			             
-				   			            	TabCli.ValorTotal += ValorTotal;
-				   			            	fwrite(&TabCli,sizeof(tpCliente),1,PtrCli);
-				   			            	gotoxy(34,13);
-											ValorTotal = 0;
-											getch();
-			   			            }
-					   		}
-					   		else
-				            {
-							   	for(i = 10;i<23;i++)
-									for(j = 29;j<79;j++)
-									{
-										gotoxy(j,i);
-										printf(" ");
-									}
-					          gotoxy(34, 13);
-			  				  printf("Quantidade maior que estoque");
-			  				  gotoxy(34,15);
-			  				  printf("Estoque: %d",TabProd.Estoque);
-			     			  getch();
-				            }
-					   		
-				   }
-				   else
-				   {
-					   	for(i = 10;i<23;i++)
-							for(j = 29;j<79;j++)
-							{
-								gotoxy(j,i);
-								printf(" ");
-							}
-			          gotoxy(34, 13);
-	  				  printf("Produto não encontrado");
-	     			  getch();
-				   }
-	   		    }
-	   		    else
-				   {
-					   	for(i = 10;i<23;i++)
-							for(j = 29;j<79;j++)
-							{
-								gotoxy(j,i);
-								printf(" ");
-							}
-			          gotoxy(34, 13);
-	  				  printf("Sem Produtos para vender");
-	     			  getch();
-				   }
-			   limparTela();
-			   gotoxy (34,14);
-			    printf("Digite CPF para comprar !!!!");
-			    fflush(stdin);
-			    gets(AuxCPF);
-			    pos = BuscaCliente(PtrCli,AuxCPF);
-	        }
-	        fclose(PtrProd);
-		   fclose(PtrVendas);
-		   fclose(PtrVendasProd);
-		   fclose(PtrCli);
-		
-		if(pos == -1)
-		{
+			//limpar a tela para continuar cadastrando
 			for(i = 10;i<23;i++)
-				for(j = 29;j<79;j++)
-					{
-						gotoxy(j,i);
-						printf(" ");
-					}
-	        gotoxy(34, 12);
-	  		printf("Cliente não encontrado");
-	     	getch();
-	   }
-   }
-  
-   
+			{	for(j = 29;j<79;j++)
+				{
+					gotoxy(j,i);
+					printf(" ");
+				}
+			}			
+			
+		}
+			gotoxy(34, 12);
+			printf("CPF do Cliente: ");
+			scanf("%d",&AuxCPF);			
+	}
+	
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-void ConsultarProduto(void)
+void ConsultarProduto(void) //consulta produto OK
 {
 	tpProduto Prod;
 	int pos, i, j;
@@ -991,6 +407,8 @@ void ConsultarProduto(void)
 	
 	gotoxy(40 ,9);
 	printf("## Consulta de produtos ##"); 
+	gotoxy(60,11);
+	printf("Sair '0' ");
 	if (PtrProd == NULL) //O Arquivo não existe!
 	{
 		gotoxy(34,12);
@@ -1011,9 +429,6 @@ void ConsultarProduto(void)
 				}
 				else
 					{
-						gotoxy(34,14);
-						printf("*** Detalhes do Registro ***");
-						//fseek(Ptr,deslocamento Bytes,a partir de);
 						fseek(PtrProd,pos,0);
 						fread(&Prod,sizeof(tpProduto),1,PtrProd);
 						gotoxy(34,15);
@@ -1021,11 +436,13 @@ void ConsultarProduto(void)
 						gotoxy(34,16);
 						printf("Descricao: %s", Prod.Descr);
 						gotoxy(34,17);
-						printf("Estoque: ",Prod.Estoque);	
+						printf("Estoque: %d", Prod.Estoque);	
 						gotoxy(34,18);
 						printf("Preco: %f", Prod.Preco );
 						gotoxy(34,19);
 						printf("Validade: %d%d%d", Prod.Valid.d,Prod.Valid.m,Prod.Valid.a );
+						gotoxy(34,20);
+						printf("Codigo fornecedor: %d", Prod.CodForn);
 					}
 				getch();
 				for(i = 10;i<23;i++)
@@ -1045,7 +462,7 @@ void ConsultarProduto(void)
 		}
 }
 
-void ConsultarFornecedor(void)
+void ConsultarFornecedor(void) //cunsultar fornecedor OK
 {
 	tpFornecedor Forn;
 	int pos, i, j;
@@ -1053,6 +470,8 @@ void ConsultarFornecedor(void)
 	
 	gotoxy(40 ,9);
 	printf("## Consulta de fornecedor ##"); 
+	gotoxy(60,11);
+	printf("Sair '0' ");
 	if (PtrForn == NULL) //O Arquivo não existe!
 	{
 		gotoxy(34,12);
@@ -1073,9 +492,7 @@ void ConsultarFornecedor(void)
 				}
 				else
 					{
-						gotoxy(34,14);
-						printf("*** Detalhes do fornecedor ***");
-						//fseek(Ptr,deslocamento Bytes,a partir de);
+					
 						fseek(PtrForn,pos,0);
 						fread(&Forn,sizeof(tpFornecedor),1,PtrForn);
 						gotoxy(34,15);
@@ -1102,8 +519,860 @@ void ConsultarFornecedor(void)
 		}
 }
 
+void ConsultarCliente(void) //consulcliente OK
+{
+	tpCliente Cli;
+	int pos, i, j;
+	FILE *PtrCli = fopen("Cliente.dat","rb");
+	
+	gotoxy(40 ,9);
+	printf("## Consulta de cliente ##"); 
+	gotoxy(60,11);
+	printf("Sair '0' ");
+	if (PtrCli == NULL) //O Arquivo não existe!
+	{
+		gotoxy(34,12);
+		printf("Erro de abertura! Arquivo inexistente");
+	}	
+	else
+		{
+			gotoxy(34,12);
+			printf("CPF do cliente: ");
+			fflush(stdin);
+			scanf("%s",&Cli.CPF);
+			while (Cli.CPF>0)
+			{
+				pos = BuscaCli(PtrCli,Cli.CPF);
+				if (pos==-1)
+				{
+					gotoxy(34,13);
+					printf("Cliente nao encontrado!");
+				}
+				else
+					{
+					
+						fseek(PtrCli,pos,0);
+						fread(&Cli,sizeof(tpCliente),1,PtrCli);
+						gotoxy(34,15);
+						printf("CPF: %s", Cli.CPF);
+						gotoxy(34,16);
+						printf("Nome: %s", Cli.Nome);
+						gotoxy(34,17);
+						printf("Quantidade de compras: %d", Cli.QtdeCompras);
+						gotoxy(34,18);
+						printf("valor total: %f", Cli.ValorTotal);	
+					}
+				getch();
+				for(i = 10;i<23;i++)
+				{
+					for(j = 29;j<79;j++)
+						{
+							gotoxy(j,i);
+							printf(" ");
+						}	
+				}
+				gotoxy(34,12);
+				printf("CPF do cliente: ");
+				fflush(stdin);
+				scanf("%s",&Cli.CPF);
+			}
+			fclose(PtrCli);
+		}
+}
+
+int BuscaAumentoPreco(FILE *Ptr, int cod)
+{
+	tpProduto R;
+	rewind(Ptr);  
+	
+	fread(&R,sizeof(tpProduto),1,Ptr);
+	while (!feof(Ptr) &&  (cod!=R.CodForn || R.status!='A'))
+		fread(&R,sizeof(tpProduto),1,Ptr);
+		
+	if (!feof(Ptr))
+		return ftell(Ptr)-sizeof(tpProduto);
+	else
+		return -1;
+}
+
+void AumentarPreco()
+{
+	
+	tpProduto Prod;
+	int pos, auxCod, posPorc, i, j, flag;
+	float x, auxPorc;
+	FILE *PtrProd = fopen("Produto.dat","rb+");
+	FILE *PtrForn = fopen("Fornecedor.dat", "rb");
+	
+	gotoxy(37,9);
+	printf("## Aumentar preco por fonecedor ##");
+	gotoxy(65,11);
+	printf("Sair '0' ");
+	gotoxy(34,12);
+	printf("Qual o codigo do fornecedor: ");
+	scanf("%d", &auxCod);
+	while(auxCod > 0)
+	{
+		pos=BuscaFornecedor(PtrForn, auxCod);
+		if(pos != -1)
+		{
+			gotoxy(34,13);
+			printf("Qual a porcentagem para aumento: ");
+			scanf("%f", &auxPorc);
+			
+			flag=0;
+			rewind(PtrProd);
+			fread(&Prod, sizeof(tpProduto), 1, PtrProd);
+			while(!feof(PtrProd))
+			{
+				if(Prod.CodForn==auxCod && Prod.status=='A')
+				{
+					flag=1;
+					
+					
+					Prod.Preco=(auxPorc/100.0+1)*Prod.Preco;
+					pos=ftell(PtrProd)-sizeof(tpProduto);
+					fseek(PtrProd, pos, 0);
+					fwrite(&Prod,sizeof(tpProduto),1,PtrProd);
+					fseek(PtrProd, pos+sizeof(tpProduto), 0);
+					
+				}
+				fread(&Prod, sizeof(tpProduto), 1, PtrProd);
+				
+			}
+			if(flag==1)
+			{
+				gotoxy(34,15);
+				printf("Aumento realizado com sucesso!");
+				getch();
+			}
+			else
+			{
+				gotoxy(34,15);
+				printf("Produto nao encontrado com este fornecedor!");
+				getch();				
+			}
+		}
+		else
+		{
+			gotoxy(34,14);
+			printf("Fornecedor não encontrado!");
+			getch();
+		}
+		
+		//limpar tela
+		for(i = 10;i<23;i++)
+				{
+					for(j = 29;j<79;j++)
+						{
+							gotoxy(j,i);
+							printf(" ");
+						}	
+				}
+		gotoxy(60,11);
+		printf("Sair '0' ");
+		gotoxy(34,12);
+		printf("Qual o codigo do fornecedor: ");
+		scanf("%d", &auxCod);
+	}
+
+	fclose(PtrForn);
+	fclose(PtrProd);
+	
+}
 
 
+void OrdenaEmBolha(void)
+{	
+	tpProduto PA, PB;
+	int a, b, QtdeReg, i, j;
+	char aux[10];
+	
+	FILE *PtrProd = fopen("Produto.dat","rb+");
+	
+	gotoxy(40,9);
+	printf("## Ordenacao de produtos ##"); 
+	gotoxy(65,11);
+	printf("Bolha.");
+		
+	gotoxy(34,12);
+	printf("Confirmar ordenacao? S/N");
+	if(toupper(getche())=='S' && PtrProd != NULL) 
+	{
+		//fseek(Ptr,deslocamento Bytes,a partir de);
+		fseek(PtrProd,0,2);
+		//QdeReg= ftell(posição do ponteiro)/sizeof(tamanho em byte do ponteiro)
+		QtdeReg = ftell(PtrProd)/sizeof(tpProduto); 
+		
+		for(a=0; a<QtdeReg-1; a++)
+			for(b=a+1; b<QtdeReg; b++)
+			{
+				//fseek(Ptr,deslocamento Bytes,a partir de);
+				fseek(PtrProd,a*sizeof(tpProduto),0);
+				//fread(Ptr,tamanho da estrutura, quant q sera lida, nome da variavel)
+				fread(&PA,sizeof(tpProduto),1,PtrProd);
+				
+				fseek(PtrProd,b*sizeof(tpProduto),0);
+				fread(&PB,sizeof(tpProduto),1,PtrProd);
+				
+				if(PA.Cod > PB.Cod)
+				{
+					fseek(PtrProd,a*sizeof(tpProduto),0);
+					fwrite(&PB,sizeof(tpProduto),1,PtrProd);
+					
+					fseek(PtrProd,b*sizeof(tpProduto),0);
+					fwrite(&PA,sizeof(tpProduto),1,PtrProd);
+				}
+			}
+			
+		gotoxy(34,14);
+		printf("Arquivo Ordenado!");
+		getch();
+		//limpar tela
+		for(i = 10;i<23;i++)
+		{
+			for(j = 29;j<79;j++)
+				{
+					gotoxy(j,i);
+					printf(" ");
+				}	
+		}		
+	}	
+	else
+	{
+		gotoxy(34,15);
+		printf("Ordenacao cancelada!");
+		getch();
+	}
+	
+	fclose(PtrProd);
+}
+
+void OrdenaInsercaoDireta()
+{
+	tpFornecedor FA, FB;
+	int TLPtr, menor, i, j;
+	
+	FILE *PtrForn = fopen("Fornecedor.dar", "rb+");
+	
+	
+	gotoxy(40,9);
+	printf("## Ordenacao de produtos ##"); 
+	gotoxy(65,11);
+	printf("Insercao. ");
+	
+	gotoxy(34,12);
+	printf("Confirmar ordenacao? S/N");
+	if(toupper(getche())=='S' && PtrForn != NULL )
+	{
+		fseek(PtrForn,0,2);//vai posicionar o ponteiro no final do arquivo
+		TLPtr=ftell(PtrForn)/sizeof(TLPtr);//vai dividir a posição do do ponteiro, pelo tamanho do arquivo
+		for(int i=0; i<TLPtr; i++)
+			menor=i;//vai guardar a primeira posição do arquivo na variavel menor
+			for(int j=i+1; j<TLPtr; j++)
+			{
+				fseek(PtrForn,j*sizeof(tpFornecedor),0);
+				fread(&FA,sizeof(tpFornecedor),1,PtrForn);	//guarda dentro de FA a posição de como se fosse o 'i'
+				fseek(PtrForn,menor*sizeof(tpFornecedor),0);
+				fread(&FB,sizeof(tpFornecedor),1,PtrForn);	//vai guardae dentro de FB a posição de como se fosse o 'j'
+				
+				if(FA.Cod<FB.Cod)//vai ver se FA é menor que FB
+					menor=j;//se for vai guardar a posição de j que é o menor na vari
+			}
+		if(i!=menor)//conferir
+		{
+			fseek(PtrForn,i*sizeof(tpFornecedor),0);
+			fread(&FA,sizeof(tpFornecedor),1,PtrForn);	//ler
+			fseek(PtrForn,menor*sizeof(tpFornecedor),0);
+			fread(&FB,sizeof(tpFornecedor),1,PtrForn);	//ler
+			
+			//fazer a troca
+			fseek(PtrForn,i*sizeof(tpFornecedor),0);
+			fwrite(&FB,sizeof(tpFornecedor),1,PtrForn);
+			
+			fseek(PtrForn,menor*sizeof(tpFornecedor),0);
+			fwrite(&FA,sizeof(tpFornecedor),1,PtrForn);				
+		}		
+		
+		gotoxy(34,14);
+		printf("Arquivo Ordenado!");
+		getch();
+		//limpar tela
+		for(i = 10;i<23;i++)
+		{
+			for(j = 29;j<79;j++)
+				{
+					gotoxy(j,i);
+					printf(" ");
+				}	
+		}				
+	}
+	else
+	{
+		gotoxy(34,15);
+		printf("Ordenacao cancelada!");
+		getch();
+	}
+	
+	fclose(PtrForn);	
+}
+
+void alteracaoProduto()
+{
+	FILE *PtrProd = fopen("Produto.dat","rb+" );
+	tpProduto Prod;
+	int auxCod, pos, i, j;
+	
+	gotoxy(40,9);
+	printf("## Alteracao de produtos ##"); 
+	gotoxy(65,11);
+	printf("Sair '0' ");
+	gotoxy(34,12);
+	printf("Codigo do produto para alteracao: ");
+	scanf("%d", &auxCod);
+	rewind(PtrProd);
+	while(auxCod > 0)
+	{
+		pos=BuscaProduto(PtrProd, auxCod);
+		if(pos != -1)
+		{
+			fseek(PtrProd, pos, 0);
+			fread(&Prod, sizeof(tpProduto),1,PtrProd);
+			gotoxy(34,14);
+			printf("Detalhes do produto:");
+			gotoxy(34,15);
+			printf("Codigo: %d", Prod.Cod);
+			gotoxy(34,16);
+			printf("Descricao: %s", Prod.Descr);
+			gotoxy(34,17);
+			printf("Estoque: %d", Prod.Estoque);
+			gotoxy(34,18);
+			printf("Preco: %f", Prod.Preco);
+			gotoxy(34,19);
+			printf("Validade %d/%d/%d", Prod.Valid.d,Prod.Valid.m,Prod.Valid.a);
+			gotoxy(34,20);
+			printf("Codigo do fornecedor: %d", Prod.CodForn);
+			getch();
+			gotoxy(34,22);
+			printf("Deseja alterar? S/N");
+			if(toupper(getche())=='S')
+			{
+				//limpar tela
+				for(i = 10;i<23;i++)
+						{
+							for(j = 29;j<79;j++)
+								{
+									gotoxy(j,i);
+									printf(" ");
+								}	
+						}		
+				
+				gotoxy(34,14);
+				printf("Codigo: %d", Prod.Cod);
+				gotoxy(34,15);
+				printf("Descricao: ");
+				fflush(stdin);
+				gets(Prod.Descr);
+				gotoxy(34,16);
+				printf("Estoque: ");
+				scanf("%d", &Prod.Estoque);
+				gotoxy(34,17);
+				printf("Preco: ");
+				scanf("%f", &Prod.Preco);
+				gotoxy(34,18);
+				printf("Validade: ");
+				scanf("%d/%d/%d", &Prod.Valid.d, &Prod.Valid.m, &Prod.Valid.a);
+				gotoxy(34,19);
+				printf("Codigo do fornecedor: %d", Prod.CodForn);
+				fseek(PtrProd,pos,0);
+				fwrite(&Prod,sizeof(tpProduto),1,PtrProd);
+			}
+			else
+			{
+				//limpar tela
+				for(i = 10;i<23;i++)
+						{
+							for(j = 29;j<79;j++)
+								{
+									gotoxy(j,i);
+									printf(" ");
+								}	
+						}						
+				gotoxy(34,14);
+				printf("Alteração cancelada!");
+				getch();
+			
+			}
+			getch();
+			gotoxy(34,21);
+			printf("Deseja alterar outro produto? S/N");
+			if(toupper(getche())=='S')
+			{
+				//limpar tela
+				for(i = 10;i<23;i++)
+						{
+							for(j = 29;j<79;j++)
+								{
+									gotoxy(j,i);
+									printf(" ");
+								}	
+						}	
+				gotoxy(65,11);
+				printf("Sair '0' ");	
+				gotoxy(34,12);	
+				printf("Codigo do produto para alteração: ");
+				scanf("%d", &auxCod);
+			}
+			else
+				auxCod=0;
+			
+		}
+		else
+		{
+			gotoxy(34,14);
+			printf("Produto nao encontrado! ");
+			getch();
+			//limpar tela
+			for(i = 10;i<23;i++)
+					{
+						for(j = 29;j<79;j++)
+							{
+								gotoxy(j,i);
+								printf(" ");
+							}	
+					}
+			gotoxy(65,11);
+			printf("Sair '0' ");	
+			gotoxy(34,12);		
+			printf("Codigo do produto para alteracao: ");
+			scanf("%d", &auxCod);
+		}
+	}
+	fclose(PtrProd);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void ExcluirFisProduto(void)
+{
+	FILE *PtrProd = fopen("Produto.dat","rb");
+	int pos, Cod, i, j;
+	tpProduto Reg;
+	gotoxy(36,9);
+	printf("### Exclusao fisica de produtos ###"); 
+	if (PtrProd == NULL) //O Arquivo não existe!
+	{
+		gotoxy(34,12);
+		printf("Erro de abertura!");
+	}
+				
+	else
+	{
+		gotoxy(65,11);
+		printf("Sair '0' ");
+		gotoxy(34,12);
+		printf("Codigo do produto: ");
+		scanf("%d",&Cod);
+		while(Cod>0)
+		{
+			pos = BuscaProduto(PtrProd,Cod);
+			if (pos==-1)
+			{	gotoxy(34,14);
+				printf("Produto nao encontrado!");
+				getch();
+			}
+			else
+			{
+				gotoxy(34,14);
+				printf("Detalhes do Registro: ");
+				//fseek(Ptr,deslocamento Bytes,a partir de);
+				fseek(PtrProd,pos,0);
+				fread(&Reg,sizeof(tpProduto),1,PtrProd);
+				gotoxy(34,15);
+				printf("Codigo: %d",Reg.Cod);
+				gotoxy(34,16);
+				printf("Nome: %s",Reg.Descr);
+				gotoxy(34,17);
+				printf("Preco: R$ %.2f",Reg.Preco);
+				gotoxy(34,18);
+				printf("Estoque: %d",Reg.Estoque);
+				gotoxy(34,19);
+				printf("Validade; %d/%d/%d",Reg.Valid.d,Reg.Valid.m,Reg.Valid.a);
+				gotoxy(34,20);
+				printf("Codigo fornecedor: %d",Reg.CodForn);	
+				
+				gotoxy(34,22);
+				printf("Confirma Exclusao (S/N)? ");
+				if(toupper(getche())=='S')
+				{
+					FILE *PtrTemp = fopen("Temp.dat","wb");
+					rewind(PtrProd); //fseek(PtrFunc,0,0);
+					fread(&Reg,sizeof(tpProduto),1,PtrProd);
+					while (!feof(PtrProd))
+					{
+						if(Cod != Reg.Cod)
+							fwrite(&Reg,sizeof(tpProduto),1,PtrTemp);
+							
+						fread(&Reg,sizeof(tpProduto),1,PtrProd);
+					}
+					fclose(PtrProd);
+					fclose(PtrTemp);
+					remove("Produto.dat");
+					rename("Temp.dat","Produto.dat");
+					
+					for(i = 10;i<23;i++)
+					{
+						for(j = 29;j<79;j++)
+							{
+								gotoxy(j,i);
+								printf(" ");
+							}	
+					}
+					gotoxy(34,14);
+					printf("Registro Excluido com sucesso!");
+					getch();	
+				}
+				
+			}
+			//limpar tela
+			for(i = 10;i<23;i++)
+					{
+						for(j = 29;j<79;j++)
+							{
+								gotoxy(j,i);
+								printf(" ");
+							}	
+					}
+			gotoxy(34,12);
+			printf("Deseja excluir outro item? S/N");
+			if(toupper(getche())=='S')
+			{
+				gotoxy(65,11);
+				printf("Sair '0' ");
+				gotoxy(34,12);
+				printf("Codigo do produto: ");
+				scanf("%d",&Cod);
+			}
+			else
+				Cod=0;
+		}
+		fclose(PtrProd);
+	}
+}
+
+
+
+void ExcluirProdutoEstoque(void)
+{
+	tpProduto Reg;
+	FILE *PtrProd = fopen("Produto.dat","rb+");
+	FILE *PtrTemp = fopen("Temp.dat","wb");
+	rewind(PtrProd); //fseek(PtrFunc,0,0);
+	fread(&Reg,sizeof(tpProduto),1,PtrProd);
+	while (!feof(PtrProd))
+	{
+		if(0 != Reg.Estoque)
+			fwrite(&Reg,sizeof(tpProduto),1,PtrTemp);
+			
+		fread(&Reg,sizeof(tpProduto),1,PtrProd);
+	}
+	fclose(PtrProd);
+	fclose(PtrTemp);
+	remove("Produto.dat");
+	rename("Temp.dat","Produto.dat");
+	getch();	
+					
+}
+
+void RealizarVendas(int &cont) //vendas
+{
+ 	tpVendas TabVendas;
+ 	tpVendasProd TabVendasProd;
+ 	tpProduto TabProd;
+ 	tpCliente TabCli;
+	 
+	int i=0, x=12,j, AuxCodProd,pos,posP,Qtde,CodVenda,CodProd,ValorTotal = 0;
+	char AuxCPF[TF],op,OP;;
+	
+	gotoxy(43,9);
+	printf("## Realizar Venda ##");
+	
+	gotoxy(34 ,12);
+	printf("Deseja Efetuar uma compra? S/N: ");
+	//toupper(getch(op));
+	//scanf("%c",&op);
+	op = toupper(getche());
+	if(op == 'S')
+	{	
+		limparTela();
+		
+		
+		gotoxy(43,9);
+		printf("## Realizar Venda ##");
+		gotoxy(34, 12);
+		printf("Digite o seu CPF: ");
+		gets(AuxCPF);
+		FILE * PtrCli = fopen ("cliente.dat","rb+");
+		FILE *PtrVendasProd = fopen ("VendProdutos.dat","ab+");
+		FILE * PtrVendas=fopen ("Vendas.dat","ab+");
+		FILE * PtrProd=fopen ("Produto.dat","rb+");
+		pos = BuscaCli(PtrCli,AuxCPF);
+		
+			while(pos != -1)//achou
+			{
+				
+				if(PtrProd!=NULL) //PtrProd == NULL significa que nao tem nd dentro do arquivo
+				{
+					
+				   gotoxy(34,13);
+				   printf("Qual produto deseja comprar(CodProd): ");
+				   scanf("%d",& AuxCodProd);
+				  
+				   posP=BuscaProduto(PtrProd,AuxCodProd);
+				   if(posP!=-1) //achou
+				   {	
+				   		fseek(PtrProd,posP,0);
+				   
+						gotoxy(34,14);
+					   	printf("Quantos deseja comprar: ");
+					   	scanf("%d",&Qtde);
+					   	if(Qtde <= TabProd.Estoque) // Menor que o estoque
+	                        {
+	                        	cont++;
+							 	TabVendas.CodVenda = cont;
+				   		        strcpy(TabVendas.CPF,AuxCPF);
+				   		        gotoxy(32,15);
+				   		        printf("Digite a data do dia da compra:");
+				   		        scanf("%d %d %d",&TabVendas.Data.d,&TabVendas.Data.m,&TabVendas.Data.a);
+					   			TabVendasProd.CodProd = AuxCodProd;
+					   			TabVendasProd.CodVenda = TabVendas.CodVenda;
+					   			TabVendasProd.Qtde = Qtde;
+					   			TabVendasProd.ValorUnitario = TabProd.Preco;
+					   			ValorTotal = TabVendasProd.Qtde * TabVendasProd.ValorUnitario;
+					   			
+						        fwrite(&TabVendas,sizeof(tpVendas),1,PtrVendas);
+						       	fwrite(&TabVendasProd,sizeof(tpVendasProd),1,PtrVendasProd);
+						       
+							    TabProd.Estoque -= Qtde;
+						        if(TabProd.Estoque == 0)
+       						         ExcluirProdutoEstoque();
+					   			TabCli.QtdeCompras++;
+					   			fwrite(&TabProd,sizeof(tpProduto),1,PtrProd);
+					   			gotoxy(34,16);
+					   			printf("Deseja Realizar mais compras?");
+					   			scanf("%c",&op);
+					   			op = toupper(getche());;
+					   			if(op=='S')
+					   			{
+			   			   		    while(op == 'S')
+						   			{
+						   				for(i = 10;i<23;i++)
+											for(j = 29;j<79;j++)
+												{
+													gotoxy(j,i);
+													printf(" ");
+												}
+									  	if(TabProd.Cod!=NULL)
+										{
+										   	gotoxy(34,13);
+										   	printf("Qual produto deseja comprar(CodProd): ");
+										   	scanf("%d",&AuxCodProd);
+										   	posP=BuscaProduto(PtrProd,AuxCodProd);
+										   if(posP!=-1) //achou
+										   {
+											   	gotoxy(34,14);
+											   	printf("Quantos deseja comprar: ");
+											   	scanf("%d",&Qtde);
+											   	if(Qtde <= TabProd.Estoque) // Menor que o estoque
+						                        {
+									   		        gotoxy(34,15);
+									   		        printf("Digite a data do dia da compra");
+									   		        scanf("%d %d %d",&TabVendas.Data.d,&TabVendas.Data.m,&TabVendas.Data.a);
+										   			TabVendasProd.CodProd = AuxCodProd;
+										   			TabVendasProd.CodVenda = cont;
+										   			TabVendasProd.Qtde = Qtde;
+										   			TabVendasProd.ValorUnitario = TabProd.Preco;
+										   			ValorTotal = TabVendasProd.Qtde * TabVendasProd.ValorUnitario;
+										   			
+										   			fwrite(&TabVendas,sizeof(tpVendas),1,PtrVendas);
+										   			fwrite(&TabVendasProd,sizeof(tpVendasProd),1,PtrVendasProd);
+												        
+											    	TabProd.Estoque-= Qtde;
+												        if(TabProd.Estoque == 0)
+						       						         ExcluirProdutoEstoque();
+										   			TabCli.QtdeCompras++;
+										   			gotoxy(34,16);
+										   			printf("Deseja Realizar mais compras?");
+										   			fseek(PtrProd,posP,0);
+										   			fwrite(&TabProd,sizeof(tpProduto),1,PtrProd);
+										   			op = toupper(getche());
+										   			if(op == 'N')
+									   				{ 
+						   			            		for(i = 10;i<23;i++)
+															for(j = 29;j<79;j++)
+																{
+																	gotoxy(j,i);
+																	printf(" ");
+																}
+														gotoxy(34,12);
+														printf("Compra efetuada com sucesso!");
+											   			TabVendas.TotVenda = ValorTotal;
+											   			gotoxy(34,13);
+											   			printf("CodVenda: %d   Valor da Compra: %.2f",TabVendas.CodVenda,TabVendas.TotVenda);
+											   			 
+											   			TabCli.ValorTotal += ValorTotal;
+											   			fwrite(&TabCli,sizeof(tpCliente),1,PtrCli);
+											   			getch();
+														ValorTotal = 0;
+				                                             
+									   				}
+										   		}
+										   		else
+									            {
+												   	for(i = 10;i<23;i++)
+														for(j = 29;j<79;j++)
+														{
+															gotoxy(j,i);
+															printf(" ");
+														}
+										          	gotoxy(34, 13);
+									  				printf("Quantidade maior que estoque");
+								  				    gotoxy(34,15);
+								  				    printf("Estoque: %d",TabProd.Estoque);
+								     			    getch();
+									            }  		
+										   }
+										   else
+										   {
+											   	for(i = 10;i<23;i++)
+													for(j = 29;j<79;j++)
+													{
+														gotoxy(j,i);
+														printf(" ");
+													}
+									          	gotoxy(34, 13);
+							  				  	printf("Produto não encontrado!");
+							     			  	getch();
+										   } 
+									   }
+									   else
+										{
+										   	for(i = 10;i<23;i++)
+												for(j = 29;j<79;j++)
+												{
+													gotoxy(j,i);
+													printf(" ");
+												}
+				                            gotoxy(34, 13);
+								  			printf("Sem Produtos para vender!");
+								     		getch();
+										}
+									}						
+			   			        }
+		   			            else
+		   			            {
+	   			            		for(i = 10;i<23;i++)
+										for(j = 29;j<79;j++)
+											{
+												gotoxy(j,i);
+												printf(" ");
+											}
+									gotoxy(34,12);
+									printf("Compra efetuada com sucesso!");
+									TabVendas.TotVenda = ValorTotal;
+									gotoxy(34,13);
+									printf("CodVenda: %d   Valor da Compra: %.2f",TabVendas.CodVenda,TabVendas.TotVenda);
+			   			             
+		   			            	TabCli.ValorTotal += ValorTotal;
+		   			            	fwrite(&TabCli,sizeof(tpCliente),1,PtrCli);
+		   			            	gotoxy(34,13);
+									ValorTotal = 0;
+									getch();
+		   			            }
+					   		}
+					   		else
+				            {
+							   	for(i = 10;i<23;i++)
+									for(j = 29;j<79;j++)
+									{
+										gotoxy(j,i);
+										printf(" ");
+									}
+					          gotoxy(34, 13);
+			  				  printf("Quantidade maior que estoque");
+			  				  gotoxy(34,15);
+			  				  printf("Estoque: %d",TabProd.Estoque);
+			     			  getch();
+				            }   		
+				   }
+				   else
+				   {
+					   	for(i = 10;i<23;i++)
+							for(j = 29;j<79;j++)
+							{
+								gotoxy(j,i);
+								printf(" ");
+							}
+			          gotoxy(34, 13);
+	  				  printf("Produto não encontrado");
+	     			  getch();
+				   }
+	   		    }
+	   		    else
+			    {
+				   	for(i = 10;i<23;i++)
+						for(j = 29;j<79;j++)
+						{
+							gotoxy(j,i);
+							printf(" ");
+						}
+		            gotoxy(34, 13);
+  				  	printf("Sem Produtos para vender");
+     			  	getch();
+			    }
+			   	limparTela();
+			   	gotoxy (34,14);
+			    printf("Digite CPF para comprar !!!!");
+			    fflush(stdin);
+			    gets(AuxCPF);
+			    pos = BuscaCli(PtrCli,AuxCPF);
+	        }
+	        fclose(PtrProd);
+		  	fclose(PtrVendas);
+		   	fclose(PtrVendasProd);
+		   	fclose(PtrCli);
+		if(pos == -1)
+		{
+			for(i = 10;i<23;i++)
+				for(j = 29;j<79;j++)
+					{
+						gotoxy(j,i);
+						printf(" ");
+					}
+	        gotoxy(34, 12);
+	  		printf("Cliente não encontrado");
+	     	getch();
+	   }
+   }
+}
 
 void Moldura (int ci, int li, int cf, int lf, int cort) //moldura
 { 
@@ -1119,7 +1388,7 @@ void Moldura (int ci, int li, int cf, int lf, int cort) //moldura
 	printf("%c",187);
 	gotoxy(cf,lf);
 	printf("%c",188);
-int i;
+	int i;
 	for(i=ci+1;i<cf;i++){
 		gotoxy(i,li);
 		printf("%c",205);
@@ -1202,16 +1471,15 @@ char subGerenciamento(void) //sub menu de gerenciamento
 	gotoxy(35,12);
 	printf(" [ B ]-Consulta de itens");
 	gotoxy(35,14);
-	printf(" [ C ]-Exclusao Fisica de item");
+	printf(" [ C ]-Exclusao");
 	gotoxy(35,16);
-	printf(" [ D ]-Exclusao Logica de Item");
+	printf(" [ D ]-Alteracao de itens");
 	gotoxy(35,18);
-	printf(" [ E ]-Alteracao de itens");
+	printf(" [ E ]-relatorio simples");
 	gotoxy(35,20);
-	printf(" [ F ]-Relatorio simples");
+	printf(" [ F ]-Aumentar preço");
 	gotoxy(35,22);
-	printf(" [ G ]-Aumentar preco");
-	gotoxy(40,24);
+	printf(" [ G ]-Ordenar itens");
 	return toupper(getche());
 }
 
@@ -1250,8 +1518,36 @@ char EscolhaGerenciamentoExclusao(void)  //menu de escolha do sub menu gerenciam
 {
 	
 	textcolor(15);
-	gotoxy(45,9);
-	printf("## QUAL DESEJA EXCLUIR? ##");
+	gotoxy(35,9);
+	printf("## QUAL TIPO DE EXCLUSAO DESEJADA? ##");
+	gotoxy(35,12);
+	printf(" [ A ]-Exclusao fisica");
+	gotoxy(35,14);
+	printf(" [ B ]-Exclusao logica");
+	gotoxy(35,16);
+	return toupper(getche());
+}
+
+char EscolhaTipoExclusaoFisica(void)
+{
+	textcolor(15);
+	gotoxy(33,9);
+	printf("## QUAL DESEJA FAZER A EXCLUSAO FISICA? ##");
+	gotoxy(35,12);
+	printf(" [ A ]-Produtos");
+	gotoxy(35,14);
+	printf(" [ B ]-Fornecedor");
+	gotoxy(35,16);
+	printf(" [ C ]-Clientes");
+	gotoxy(40,25);
+	return toupper(getche());
+}
+
+char EscolhaTipoExclusaoLogica(void)
+{
+	textcolor(15);
+	gotoxy(33,9);
+	printf("## QUAL DESEJA FAZER A EXCLUSAO LOGICA? ##");
 	gotoxy(35,12);
 	printf(" [ A ]-Produtos");
 	gotoxy(35,14);
@@ -1293,21 +1589,39 @@ char EscolhaGerenciamentoRelatorioS(void)  //menu de escolha do sub menu gerenci
 	gotoxy(40,25);
 	return toupper(getche());
 }
+
+char EscolhaGerenciamentoordenacao(void)
+{
+	textcolor(15);
+	gotoxy(45,9);
+	printf("## QUAL DESEJA ORDENAR? ##");
+	gotoxy(35,12);
+	printf(" [ A ]-Produtos");
+	gotoxy(35,14);
+	printf(" [ B ]-Fornecedor");
+	gotoxy(35,16);
+	printf(" [ C ]-Clientes");
+	gotoxy(40,25);
+	return toupper(getche());
+}
+
 int main(void)
 {
 	
-	int vendas=0;
-	char op, opsub, opEscolha;
-	FILE *PtrProd = fopen ("Produto.dat","ab");
-	FILE *PtrForn = fopen ("Fornecedor.dat","ab");
-	FILE *PtrCli = fopen ("cliente.dat","ab");
-	FILE *PtrVendas = fopen ("vendas.dat","ab");
-	FILE *PtrVendasProd = fopen ("VendProdutos.dat","ab");
-	fclose(PtrProd);
-	fclose(PtrForn);
+	FILE * PtrForn = fopen ("Fornecedor.dat","ab");
+	FILE * PtrProd = fopen ("Produto.dat","ab+");
+	FILE * PtrVenda = fopen ("Vendas.dat","ab+");
+	FILE * PtrVendaProd = fopen ("VendProdutos.dat","ab+");
+	FILE * PtrCli = fopen ("Cliente.dat","ab+");
+	
 	fclose(PtrCli);
-	fclose(PtrVendas);
-	fclose(PtrVendasProd);
+	fclose(PtrForn);
+	fclose(PtrProd);
+	fclose(PtrVenda);
+	fclose(PtrVendaProd);
+	
+	char op, opsub, opEscolha, opEscolhaExclusao;
+	int cont=0;
 	formulario();
 	
 	gotoxy(100,30);
@@ -1326,7 +1640,7 @@ int main(void)
 										break;
 										
 							case 'B': 	limparTela(); 
-								 		RealizarVendas(vendas);//Realizar Venda
+								 		RealizarVendas(cont);//Realizar Venda
 										break;
 										
 							case 'C':	limparTela();
@@ -1369,11 +1683,11 @@ int main(void)
 														break;
 														
 											case 'B':	limparTela();
-														//fornecedor
+														ConsultarFornecedor();//fornecedor
 														break;
 														
 											case 'C':	limparTela();
-														//cliente
+														ConsultarCliente();//cliente
 														break;
 										}
 										break;
@@ -1383,15 +1697,39 @@ int main(void)
 										switch(opEscolha)
 										{
 											case 'A':	limparTela();
-														ExcluirFisProduto();//Produtos
+														opEscolhaExclusao=EscolhaTipoExclusaoFisica(); //EXCLUSAO FISICA
+														switch(opEscolhaExclusao)
+														{
+															case 'A':	limparTela();
+																		ExcluirFisProduto();//Produtos
+																		break;
+														
+															case 'B':	limparTela();	
+																		//fornecedor
+																		break;
+														
+															case 'C':	limparTela();
+																		//cliente
+																		break;
+														}
 														break;
 														
 											case 'B':	limparTela();
-														ExcluirFisFornecedor();//fornecedoR
-														break;
+														opEscolhaExclusao=EscolhaTipoExclusaoLogica(); //EXCLUSAO LOGICA
+														switch(opEscolhaExclusao)
+														{
+															case 'A':	limparTela();
+																		//Produtos
+																		break;
 														
-											case 'C':	limparTela();
-														//cliente
+															case 'B':	limparTela();	
+																		//fornecedor
+																		break;
+														
+															case 'C':	limparTela();
+																		//cliente
+																		break;
+														}
 														break;
 										}
 										break;
@@ -1401,7 +1739,7 @@ int main(void)
 										switch(opEscolha)
 										{
 											case 'A':	limparTela();
-														//Produtos
+														alteracaoProduto();//Produtos
 														break;
 														
 											case 'B':	limparTela();	
@@ -1434,8 +1772,26 @@ int main(void)
 										}				
 										break;
 										
+							case 'G':	limparTela();
+										opEscolha=EscolhaGerenciamentoordenacao();//Ordenação
+										switch(opEscolha)
+										{
+											case 'A':	limparTela();
+														OrdenaEmBolha();//Produtos
+														break;
+														
+											case 'B':	limparTela();	
+														OrdenaInsercaoDireta();//fornecedor
+														break;
+														
+											case 'C':	limparTela();
+														//cliente
+														break;
+										}
+										break;
+										
 							case 'F':	limparTela();
-										//aumentar preço fornecedor
+										AumentarPreco();//aumentar preço fornecedor
 										break;
 						}
 						break;
