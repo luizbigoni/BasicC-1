@@ -400,7 +400,98 @@ void CadastroCliente() // cadastro Cliente
 	
 }
 
-
+void ExcluirFisCliente(void)
+{
+	FILE *PtrCli = fopen("cliente.dat","rb");
+	int pos;
+	char AuxCPF;
+	tpCliente Reg;
+	tpVendas RegV;
+	tpVendasProduto RegVP;
+	gotoxy(40,9);
+	printf("### EXCLUSAO FISICA DE CLIENTE ###"); 
+	if (PtrCli == NULL) //O Arquivo não existe!
+	{
+		gotoxy(40,12);
+		printf("Erro de abertura!");
+	}
+	else
+		{
+			gotoxy(34,12);
+			printf("CLIENTE a excluir: ");
+			fflush(stdin); gets(AuxCPF);
+			if (strlen(AuxCPF)==11)
+			{
+				pos = BuscaCliente(PtrCli,AuxCPF);
+				if (pos==-1)
+				{
+					gotoxy(34,14);
+					printf("CLIENTE nao encontrado!");
+					getch();
+					fclose(PtrCli);
+				}
+				else
+					{
+						gotoxy(40,13);
+						printf("*** Detalhes do Registro ***");
+						//fseek(Ptr,deslocamento Bytes,a partir de);
+						fseek(PtrCli,pos,0);
+						fread(&Reg,sizeof(tpCliente),1,PtrCli);
+						gotoxy(34,15);
+						printf("CPF: %d",Reg.CPF);	
+						gotoxy(34,16);
+						printf("Nome: %s",Reg.Nome);
+						gotoxy(34,17);
+						printf("QtdCompras: %d",Reg.QtdeCompras);
+						gotoxy(34,18);
+						printf("ValorTotal: %.2f",Reg.ValorTotal);	
+						gotoxy(40,20);
+						printf("Confirma Exclusao (S/N)? ");
+						if (toupper(getche())=='S')
+						{
+							FILE *PtrVendas = fopen("vendas.dat","rb");
+							FILE *PtrTemp = fopen("Temp.dat","wb");
+							rewind(PtrCli); //fseek(PtrFunc,0,0);
+							fread(&Reg,sizeof(tpCliente),1,PtrCli);
+							while (!feof(PtrCli))
+							{
+								if(stricmp(AuxCPF,Reg.CPF)!= 0)
+									fwrite(&Reg,sizeof(tpCliente),1,PtrTemp);
+									
+								fread(&Reg,sizeof(tpCliente),1,PtrCli);
+							}
+							fclose(PtrCli);
+							fclose(PtrTemp);
+							remove("Cliente.dat");
+							rename("Temp.dat","Cliente.dat");
+					
+							
+							FILE *PtrTempo = fopen("Tempo.dat","wb");
+							
+							rewind(PtrProd); //fseek(PtrFunc,0,0);
+							fread(&RegP,sizeof(tpProduto),1,PtrProd);
+							while (!feof(PtrProd))
+							{
+								if(Cod != RegP.CodForn)
+									fwrite(&RegP,sizeof(tpProduto),1,PtrTempo);
+									
+								fread(&RegP,sizeof(tpProduto),1,PtrProd);
+							}
+							
+							fclose(PtrProd);
+							fclose(PtrTempo);
+							remove("Produto.dat");
+							rename("Tempo.dat","Produto.dat");
+							limparTela();
+							gotoxy(40,14);
+							printf("Registro Excluido!");
+							getch();	
+						}
+						else fclose(PtrForn);
+					}
+			}
+		}
+}
 
 void ExcluirFisFornecedor(void)
 {
